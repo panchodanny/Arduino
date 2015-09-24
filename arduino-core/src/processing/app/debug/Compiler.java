@@ -226,7 +226,7 @@ public class Compiler implements MessageConsumer {
     String res = "";
     SortedSet<String> treeSet = new TreeSet<String>(buildPrefs.keySet());
     for (String k : treeSet) {
-      if (k.startsWith("build.") || k.startsWith("compiler.") || k.startsWith("recipes."))
+      if (k.startsWith("build.") || k.startsWith("compiler.") || k.startsWith("recipe."))
         res += k + " = " + buildPrefs.get(k) + "\n";
     }
     return res;
