@@ -330,6 +330,11 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
 
+    <!-- Unzip AVRDUDE wrapper -->
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/avr/bin">
+      <fileset file="macosx/dist/avrdude" />
+    </copy>
+
     <copy todir="macosx/work/${staging_hardware_folder}/tools/">
       <fileset file="macosx/dist/bossac" />
     </copy>
@@ -371,6 +376,11 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
     </chmod>
 
+    <!-- macosx gatekeeper workaround. See https://github.com/arduino/Arduino/issues/3468 -->
+    <chmod perm="-x">
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/avrdude_bin" />
+    </chmod>
+
     <!-- Unzip OpenOCD tools -->
     <antcall target="untar">
       <param name="archive_file" value="${staging_folder}/dist/OpenOCD-0.9.0-arduino.org-x86_64-apple-darwin13.4.0.tar.bz2" />
@@ -378,8 +388,17 @@
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
-    <!--<chmod perm="755" file="macosx/work/${staging_hardware_folder}/tools/OpenOCD/openocd" />
--->
+
+    <!-- Unzip OPENOCD wrapper -->
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino/bin">
+      <fileset file="macosx/dist/openocd" />
+    </copy>
+
+    <!-- macosx gatekeeper workaround for openocd. See https://github.com/arduino/Arduino/issues/3468 -->
+    <chmod perm="-x">
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/openocd.bin" />
+    </chmod>
+
     <!-- Unzip CMSIS -->
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/dist/CMSIS.zip" />
