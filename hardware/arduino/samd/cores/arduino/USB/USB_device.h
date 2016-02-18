@@ -55,7 +55,8 @@ extern uint32_t UDD_FifoByteCount(uint32_t ep);
 extern void UDD_ReleaseRX(uint32_t ep);
 extern void UDD_ReleaseTX(uint32_t ep);
 extern uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len);
-extern uint8_t UDD_Recv8(uint32_t ep);
+//extern uint8_t UDD_Recv8(uint32_t ep); //modificato bar
+extern uint8_t UDD_Recv8(uint32_t ep, uint32_t len); //aggiunto bar  
 extern void UDD_Recv(uint32_t ep, uint8_t** data);
 extern void UDD_Init(void);
 extern void UDD_InitEP( uint32_t ul_ep, uint32_t ul_ep_cfg );

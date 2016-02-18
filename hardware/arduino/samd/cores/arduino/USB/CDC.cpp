@@ -32,7 +32,7 @@
 
 #ifdef CDC_ENABLED
 
-#define CDC_SERIAL_BUFFER_SIZE	64
+#define CDC_SERIAL_BUFFER_SIZE	63  //prima era 64
 
 /* For information purpose only since RTS is not always handled by the terminal application */
 #define CDC_LINESTATE_DTR		0x01 // Data Terminal Ready
@@ -146,6 +146,9 @@ bool WEAK CDC_Setup(Setup& setup)
 uint32_t _serialPeek = -1;
 void Serial_::begin(uint32_t baud_count)
 {
+	//modificato bar
+	//flush();
+	
 }
 
 void Serial_::begin(uint32_t baud_count, uint8_t config)
@@ -156,16 +159,57 @@ void Serial_::end(void)
 {
 }
 
-void Serial_::accept(void)
-{
-	ring_buffer *buffer = &cdc_rx_buffer;
-	uint32_t i = (uint32_t)(buffer->head+1) % CDC_SERIAL_BUFFER_SIZE;
+//void Serial_::accept(void)  //bar   
+//{
+	//unsigned int num_char;
+	
+	//SerialUSB.println("Serial::accept cc");  //bar
+	
+	//num_char=USBD_Available(CDC_ENDPOINT_OUT);  //bar  //vedo quanti byte devo ricevere
+	//SerialUSB.println("num_char: ");     //bar
+	//SerialUSB.println(num_char);         //bar
+	//uint8_t buffer[CDC_SERIAL_BUFFER_SIZE];  //si dichiara un array di tipo uint8_t di dimensione CDC_SERIAL_BUFFER_SIZE
+	//uint8_t car = 0;
+	//uint32_t len = USBD_Recv(CDC_ENDPOINT_OUT, (void*)&buffer, CDC_SERIAL_BUFFER_SIZE);
+	//uint32_t len = USBD_Recv(CDC_ENDPOINT_OUT);  //commentato bar
+	//SerialUSB.print("len: ");  //bar
+	//SerialUSB.println(len);  //bar
+	//noInterrupts();
+	//ring_buffer *ringBuffer = &cdc_rx_buffer;    //si dichiara una variabile di tipo ring buffer
+	//uint32_t i = ringBuffer->head;     //si dichiara una variabile indice del buffer
+	//SerialUSB.print("i: ");  //bar
+	//SerialUSB.println(i);  //bar
 
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the
 	// current location of the tail), we're about to overflow the buffer
 	// and so we don't write the character or advance the head.
+	/*uint32_t k = 0;
+	i = (i + 1) % CDC_SERIAL_BUFFER_SIZE;     //ok ci vuole
+	while ((i != ringBuffer->tail) && (num_char > 0)) {  //modificare len con num_char
+		car = USBD_Recv(CDC_ENDPOINT_OUT);
+		ringBuffer->buffer[ringBuffer->head] = car;//buffer[k++];  //vedere meglio qua
+		ringBuffer->head = i;  // ok va bene
+		i = (i + 1) % CDC_SERIAL_BUFFER_SIZE;  //ok ci vuole
+		num_char--;  //sostituire len con num_char
+	}*/
+	
+	//SerialUSB.print("num_char dopo while: ");   //bar
+	//SerialUSB.println(num_char);   //bar
+	//interrupts();
+	
+	
+	/*ring_buffer *buffer = &cdc_rx_buffer;  //commentato bar
+	uint32_t i = (uint32_t)(buffer->head+1) % CDC_SERIAL_BUFFER_SIZE;  //commentata bar
+	//uint32_t i = (uint32_t)(buffer->head) % CDC_SERIAL_BUFFER_SIZE;
+	
+	// if we should be storing the received character into the location
+	// just before the tail (meaning that the head would advance to the
+	// current location of the tail), we're about to overflow the buffer
+	// and so we don't write the character or advance the head.
 	while (i != buffer->tail) {
+		SerialUSB.print("i: ");  //bar
+		SerialUSB.println(i);    //bar
 		uint32_t c;
 		if (!USBD_Available(CDC_ENDPOINT_OUT)) {
             UDD_ReleaseRX(CDC_ENDPOINT_OUT);
@@ -176,13 +220,55 @@ void Serial_::accept(void)
 		buffer->head = i;
 
 		i = (i + 1) % CDC_SERIAL_BUFFER_SIZE;
+	} */ //commentato bar
+	
+	
+//}   //bar
+
+
+
+void Serial_::accept(void)  //implementazione cc
+{
+	uint8_t buffer[CDC_SERIAL_BUFFER_SIZE];
+	uint32_t len = USBD_Recv(CDC_ENDPOINT_OUT, (void*)&buffer,CDC_SERIAL_BUFFER_SIZE);
+	//flush(); //modificato bar
+	
+	//SerialUSB.print("len in accept: ");
+	//SerialUSB.println(len);
+	noInterrupts();
+	ring_buffer *ringBuffer = &cdc_rx_buffer;
+	uint32_t i = ringBuffer->head;
+	//for (i=0; i < CDC_SERIAL_BUFFER_SIZE; i++) ringBuffer->buffer[i]=0x00;  //modificato bar (inizializzo il buffer)
+	
+	uint32_t k = 0;
+	i = (i+1) % CDC_SERIAL_BUFFER_SIZE;
+	while((i != ringBuffer->tail) && (len>0) && (len <= CDC_SERIAL_BUFFER_SIZE))  //modificato bar
+	{
+		len--;
+		ringBuffer->buffer[ringBuffer->head] = buffer[k++];
+		ringBuffer->head = i;
+		//if(i < CDC_SERIAL_BUFFER_SIZE) 
+		i = (i+1) % CDC_SERIAL_BUFFER_SIZE;  //modificato bar
+		//SerialUSB.print("len nel while: ");
+		//SerialUSB.println(len);
+		
 	}
-}
+	//USBD_Flush(CDC_ENDPOINT_OUT);  //modificato bar
+	//ringBuffer->head = ringBuffer->tail;  //modificato bar per prova (così non si riceve niente, OK)
+	interrupts();
+}  //implementazione cc
+
+
 
 int Serial_::available(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
+	//unsigned int r=0;
+	//return USBD_Available(CDC_ENDPOINT_OUT); //modificato bar
 	return (uint32_t)(CDC_SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % CDC_SERIAL_BUFFER_SIZE;
+	//uint32_t delta = buffer->head - buffer->tail;   //modificato bar
+	//if(delta < 0) return CDC_SERIAL_BUFFER_SIZE + delta;   //modificato bar
+	//else return delta;   //modificato bar
 }
 
 int Serial_::peek(void)
@@ -202,18 +288,51 @@ int Serial_::peek(void)
 int Serial_::read(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
+	unsigned int i=0;
 
 	// if the head isn't ahead of the tail, we don't have any characters
 	if (buffer->head == buffer->tail)
 	{
+		buffer->head = 0;
+		buffer->tail = 0;
+		//for(i=0; i < CDC_SERIAL_BUFFER_SIZE; i++) buffer->buffer[i]=0x00;  //modificato bar
 		return -1;
 	}
 	else
 	{
 		unsigned char c = buffer->buffer[buffer->tail];
-		buffer->tail = (uint32_t)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
+		/*if((uint32_t)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE)  //modificato bar
+		{
+			buffer->tail = (uint32_t)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
+		}
+		else
+		{
+			buffer->head = buffer->tail;  //modificato bar
+			return c;
+		}*/	
+		if(buffer->tail < CDC_SERIAL_BUFFER_SIZE)  //modificato bar
+		{
+			buffer->tail = (uint32_t)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
+		}
+		else  //modificato bar
+		{
+			buffer->head = 0;
+			buffer->tail = 0;
+			//for (i=0; i < CDC_SERIAL_BUFFER_SIZE; i++) buffer->buffer[i]=0x00;
+		}	
+		//buffer->tail = (uint32_t)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
 		if (USBD_Available(CDC_ENDPOINT_OUT))
+		{
 			accept();
+			//USBD_Flush(CDC_ENDPOINT_OUT);  //modificato bar
+			//buffer->head = buffer->tail; //modificato bar
+			//cdc_rx_buffer.head = 0;  //modificato bar
+			//cdc_rx_buffer.tail = 0;  //modificato bar
+			//cdc_rx_buffer.head = cdc_rx_buffer.tail;  //modificato bar
+		}
+			//accept();  modificato bar
+			//buffer->head = buffer->tail; //modificato bar
+		flush();  //aggiunto bar	
 		return c;
 	}
 }

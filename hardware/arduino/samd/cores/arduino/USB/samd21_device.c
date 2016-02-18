@@ -268,22 +268,42 @@ uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 	return len;
 }
 
-uint8_t UDD_Recv8(uint32_t ep)
-{
-	TRACE_DEVICE(printf("=> UDD_Recv8 : ep=%d\r\n", (char)ep);)
+//uint8_t UDD_Recv8(uint32_t ep)
+//{
+	//TRACE_DEVICE(printf("=> UDD_Recv8 : ep=%d\r\n", (char)ep);)
 
-    usb_endpoint_table[ep].DeviceDescBank[0].ADDR.reg = (uint32_t)&udd_ep_out_cache_buffer[ep];
-	usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.MULTI_PACKET_SIZE = 8;
-	usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.BYTE_COUNT = 0;
-	USB->DEVICE.DeviceEndpoint[ep].EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_BK0RDY;
-	TRACE_DEVICE(printf("=> UDD_Recv8 : data=%lu\r\n", (unsigned long)data);)
+    //usb_endpoint_table[ep].DeviceDescBank[0].ADDR.reg = (uint32_t)&udd_ep_out_cache_buffer[ep];
+	//usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.MULTI_PACKET_SIZE = 8;   //in cc viene sostituito con len
+	//usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.MULTI_PACKET_SIZE = len;  //modificato bar
+	//usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.BYTE_COUNT = 0;  //non si sa il perchè di questo settaggio
+	//USB->DEVICE.DeviceEndpoint[ep].EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_BK0RDY;  //permette il trasferimento dati
+	//TRACE_DEVICE(printf("=> UDD_Recv8 : data=%lu\r\n", (unsigned long)data);)
 
 	/* Wait for transfer to complete */
-	while (!( USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT0 ));
+	//while (!( USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT0 ));   //aspetta che il trasferimento venga completato
 	/* Clear Transfer complete 0 flag */
-	USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.bit.TRCPT0 = 1;
+	//USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.bit.TRCPT0 = 1;  //cancella il flag per il trasferimento completato
 
-	return udd_ep_out_cache_buffer[ep][0];
+	//return udd_ep_out_cache_buffer[ep][0];  //ritorna il contenuto del buffer cache
+//}
+
+uint8_t UDD_Recv8(uint32_t ep, uint32_t len)   //implementazione cc
+{
+	TRACE_DEVICE(printf("=> UDD_Recv8 : ep=%d\n\r", (char)ep);)
+	
+	if(len > 64) len = 64;
+	usb_endpoint_table[ep].DeviceDescBank[0].ADDR.reg = (uint32_t)&udd_ep_out_cache_buffer[ep];
+	usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.MULTI_PACKET_SIZE = len;   //in cc viene sostituito con len
+	usb_endpoint_table[ep].DeviceDescBank[0].PCKSIZE.bit.BYTE_COUNT = 0;
+	
+	udd_ack_out_received(ep);
+	TRACE_DEVICE(printf("=> UDD_Recv8 : data=%lu\n\r", (unsigned long)data);)
+	
+	while(!udd_is_OUT_transf_cplt(ep));
+	
+	udd_clear_transf_cplt(ep);
+	
+	return udd_ep_out_cache_buffer[ep][0]; 
 }
 
 void UDD_Recv(uint32_t ep, uint8_t** ppData)
