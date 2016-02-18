@@ -1,2 +1,2 @@
-zeroedbg.name=M0 Pro Programming Port
+zeroedbg.name=Atmel EDBG Programming Port
 zeroedbg.program.tool=openocd
