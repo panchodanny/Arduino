@@ -100,31 +100,39 @@ mzero_bl.bootloader.low_fuses=0xff
 ######################################################
 #ARDUINO TIAN (WITH) BOOTLOADER
 
-tian_bl.name=Arduino Tian
-tian_bl.upload.via_ssh=true
-tian_bl.vid.0=0x10C4
-tian_bl.pid.0=0xEA70
-tian_bl.upload.tool=avrdude
-#tian_bl.upload.protocol=stk500v2
-tian_bl.upload.protocol=wiring
-tian_bl.upload.maximum_size=262144
-tian_bl.upload.use_1200bps_touch=true
-tian_bl.upload.wait_for_upload_port=true
-tian_bl.upload.native_usb=true
-tian_bl.upload.speed=57600
-tian_bl.build.mcu=cortex-m0plus
-tian_bl.build.f_cpu=48000000L
-tian_bl.build.usb_product="Arduino Tian"
-tian_bl.build.board=SAM_ZERO
-tian_bl.build.core=arduino
-tian_bl.build.extra_flags=-D__SAMD21G18A__ -mthumb {build.usb_flags}
-tian_bl.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-tian_bl.build.variant=arduino_zero
-tian_bl.build.variant_system_lib=
-tian_bl.build.vid=0x2a03
-tian_bl.build.pid=0x8052
-tian_bl.build.section.start=0x4000
-tian_bl.build.emu.mcu=atmega2560
-tian_bl.bootloader.tool=avrdude
-tian_bl.bootloader.low_fuses=0xff
-tian_bl.bootloader.file=sofia/Sofia_Tian_151118.hex
+tian.name=Arduino Tian
+tian.upload.via_ssh=true
+tian.vid.0=0x10C4
+tian.pid.0=0xEA70
+
+tian.vid.1=0x10C4
+tian.pid.1=0xEA70MI_01
+
+tian.vid.2=0x10C4
+tian.pid.2=0xEA70MI_00
+
+
+tian.upload.tool=avrdude
+#tian.upload.protocol=stk500v2
+tian.upload.protocol=wiring
+tian.upload.maximum_size=262144
+tian.upload.use_1200bps_touch=true
+tian.upload.wait_for_upload_port=true
+tian.upload.native_usb=true
+tian.upload.speed=57600
+tian.build.mcu=cortex-m0plus
+tian.build.f_cpu=48000000L
+tian.build.usb_product="Arduino Tian"
+tian.build.board=SAM_ZERO
+tian.build.core=arduino
+tian.build.extra_flags=-D__SAMD21G18A__ -mthumb {build.usb_flags}
+tian.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+tian.build.variant=arduino_zero
+tian.build.variant_system_lib=
+tian.build.vid=0x2a03
+tian.build.pid=0x8052
+tian.build.section.start=0x4000
+tian.build.emu.mcu=atmega2560
+tian.bootloader.tool=avrdude
+tian.bootloader.low_fuses=0xff
+tian.bootloader.file=sofia/Sofia_Tian_151118.hex

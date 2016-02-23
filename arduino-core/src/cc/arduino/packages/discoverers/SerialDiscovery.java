@@ -59,7 +59,12 @@ public class SerialDiscovery implements Discovery {
     List<BoardPort> res = new ArrayList<BoardPort>();
 
     List<String> ports = Serial.list();
-
+    //Workaround #1: Management of 'labels' for Arduino Tian. due to the CP2105 dual USB Driver
+    Boolean prev_tian = false; 
+    String tian_progr_port = " - Programming Port"; 
+    String tian_cons_port = " - Console Port"; 
+    String tian_type_port ="";
+    
     for (String port : ports) {
       Map<String, Object> boardData = os.resolveDeviceAttachedTo(port, BaseNoGui.packages, devicesListOutput);
 
@@ -83,10 +88,19 @@ public class SerialDiscovery implements Discovery {
 
           String boardName = board.getName();
           if (boardName != null) {
+            //Workaround #1
+            if(board.getId().toUpperCase().equals("TIAN")){ 
+              if(prev_tian)
+                tian_type_port = tian_cons_port;
+              else 
+                tian_type_port = tian_progr_port;
+              prev_tian = !prev_tian;
+            }
+
             if (warning != null) {
-              label += " (" + boardName + " - " + _(warning) + ")";
+              label += " (" + boardName + tian_type_port + " - " + _(warning) + ")";
             } else {
-              label += " (" + boardName + ")";
+              label += " (" + boardName + tian_type_port + ")";
             }
           }
           boardPort.setBoardName(boardName);
