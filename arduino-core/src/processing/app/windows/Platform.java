@@ -39,7 +39,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
 import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.io.BufferedReader;
+import java.io.StringReader;
 
 
 // http://developer.apple.com/documentation/QuickTime/Conceptual/QT7Win_Update_Guide/Chapter03/chapter_3_section_1.html
@@ -350,4 +362,75 @@ public class Platform extends processing.app.Platform {
       return super.preListAllCandidateDevices();
     }
   }
+  
+  @Override
+  public List<String> sortSerialList(List<String> unsortedSerialList) {
+	try{
+		String sortedDeviceList = sortCandidateDevice( preListAllCandidateDevices() );
+		List<String> sortList = new ArrayList<String>();
+		BufferedReader reader = new BufferedReader(new StringReader(sortedDeviceList));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			int idx1 = line.indexOf('-');
+			if(idx1 > 0){
+				String key = line.substring(0, idx1).trim();
+				if(unsortedSerialList.contains(key)){
+					sortList.add(key);
+				}
+			}
+		}
+		return sortList;
+	}catch(IOException ex){
+		return unsortedSerialList;
+	}
+	
+  }
+  
+    /**
+	Order Tian Devices
+	**/
+	private static String sortCandidateDevice(String unsortedDeviceList) throws IOException{
+		Map<String, String> unsortMap = new HashMap<String, String>();
+		BufferedReader reader = new BufferedReader(new StringReader(unsortedDeviceList));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			int idx1 = line.indexOf('-');
+			if(idx1 > 0){
+				String entryCom = line.substring(0, idx1  );
+				String entryDesc = line.substring(idx1 + 1, line.length() -1);
+				unsortMap.put(entryCom, entryDesc);
+			}
+		}
+	
+		List<Map.Entry<String, String>> list = new LinkedList<Map.Entry<String, String>>(unsortMap.entrySet());
+		
+		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+			public int compare(Map.Entry<String, String> serial1, Map.Entry<String, String> serial2) {
+				return (serial1.getValue()).compareTo(serial2.getValue());
+			}
+			
+		});
+		
+		Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+			public int compare(Map.Entry<String, String> serial1, Map.Entry<String, String> serial2) {
+				int idx1 = serial1.getValue().lastIndexOf('\\');
+				int idx2 = serial2.getValue().lastIndexOf('\\');
+				
+				String str1 = serial1.getValue().substring( idx1 + 1 );
+				String str2 = serial2.getValue().substring( idx2 + 1 );
+				
+				return (str1).compareTo(str2);
+			}
+		});
+
+		String sortedDeviceList = "";
+		for (Iterator<Map.Entry<String, String>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<String, String> entry = it.next();
+			sortedDeviceList += entry.getKey() + "- " + entry.getValue() + "\n";
+		}
+		
+		return sortedDeviceList;
+	}
+  
+  
 }
