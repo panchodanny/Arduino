@@ -1,6 +1,10 @@
 /**********************************************************************************************************************************************************
 This sketch gives a simple demonstration of how to use RTC library.
 The code sets date and time using internal structure and then print on serial date and time. Time representation is 12 hour mode
+
+NOTE: for M0/M0 pro only you can select the oscillator source for count.
+If you want to use a low power oscillator use rtc.begin(TIME_H12, LOW_POWER); function.
+If you want to use a more accurate oscillator use rtc.begin(TIME_H12, HIGH_PRECISION); function.
 **********************************************************************************************************************************************************/
 
 

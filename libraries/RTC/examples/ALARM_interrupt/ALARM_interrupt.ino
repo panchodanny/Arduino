@@ -2,6 +2,10 @@
 * This sketch demonstrate how to use alarm in interrupt mode.
 This mode is more conveniently because you use processor for other tasks and when alarm match occurs interrupt routine is executed.
 In this way, alarm flag checking is indipendent from main program flow.
+
+NOTE: for M0/M0 pro only you can select the oscillator source for count.
+If you want to use a low power oscillator use rtc.begin(TIME_H24, LOW_POWER); function.
+If you want to use a more accurate oscillator use rtc.begin(TIME_H24, HIGH_PRECISION); function.
 ******************************************************************************************************************************************************************************/
 
 

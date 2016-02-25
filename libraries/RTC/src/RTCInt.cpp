@@ -1,17 +1,14 @@
 /*
   RTC library for Arduino M0/M0PRO.
   Copyright (c) 2015 Arduino SRL. All right reserved.
-
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
-
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Lesser General Public License for more details.
-
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -27,7 +24,7 @@ static bool time_Mode = false;
 *Input Parameters: bool timeRep this parameter can be TIME_H24 (24 hour mode) or TIME_H12 (12 hour mode)
 *Return Parameter: None
 *******************************************************************************************/
-void RTCInt::begin(bool timeRep) 
+void RTCInt::begin(bool timeRep, int oscillatorType) 
 {
   
   
@@ -36,7 +33,15 @@ void RTCInt::begin(bool timeRep)
   GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK4 | (RTC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
   while (GCLK->STATUS.bit.SYNCBUSY);
   
-  GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K | GCLK_GENCTRL_ID(4) | GCLK_GENCTRL_DIVSEL );
+  //Set the oscillator to use - M0 only
+  if(oscillatorType==HIGH_PRECISION)
+  //External oscillator
+  GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K | GCLK_GENCTRL_ID(4) | GCLK_GENCTRL_DIVSEL );
+  
+  else
+  //Internal low power oscillator (default configuration)
+  GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |  GCLK_GENCTRL_SRC_OSCULP32K | GCLK_GENCTRL_ID(4) | GCLK_GENCTRL_DIVSEL );
+  
   while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
   
   GCLK->GENDIV.reg = GCLK_GENDIV_ID(4); 
@@ -72,6 +77,10 @@ void RTCInt::begin(bool timeRep)
 	RTCresetRemove();
   RTCenable();
   
+}
+
+void RTCInt::begin(bool timeRep){
+    begin(timeRep, LOW_POWER);
 }
 
 /*
@@ -131,7 +140,7 @@ unsigned int RTCInt::getMinute()
 
 
 /**********************************************************************************************************************
-*Description: Function for getting time (hours, minutes and seconds). This function fills a structure called local_time
+*Description: Function for getting time (hours, minutes and seconds). This function fills a structure called time
 			  accessible in the class RTCInt.	
 *Input Parameters: None
 *Return Parameter: None
@@ -140,15 +149,15 @@ void RTCInt::getTime(void)
 {
 	unsigned int hour=0, h=0;
 	
-	local_time.hour = getHour();
+	time.hour = getHour();
 	if(time_Mode == TIME_H12)
 	{
 		h=RTC->MODE2.CLOCK.bit.HOUR;
 		while (RTCSync());
-		local_time.Tmode = h & 0x10;
+		time.Tmode = h & 0x10;
 	}	
-	local_time.minute = getMinute();
-	local_time.second = getSecond();
+	time.minute = getMinute();
+	time.second = getSecond();
 }
 
 unsigned char RTCInt::getMeridian(void)
@@ -218,16 +227,16 @@ unsigned int RTCInt::getYear()
 
 
 /**********************************************************************************************************************
-*Description: Function for getting date (day, month and year). This function fills a structure called local_date
+*Description: Function for getting date (day, month and year). This function fills a structure called date
 			  accessible in the class RTCInt.	
 *Input Parameters: None
 *Return Parameter: None
 ***********************************************************************************************************************/
 void RTCInt::getDate(void)
 {
-	local_date.day = getDay();
-	local_date.month = getMonth();
-	local_date.year = getYear();
+	date.day = getDay();
+	date.month = getMonth();
+	date.year = getYear();
 }
 
 /*
@@ -314,15 +323,15 @@ void RTCInt::setTime(unsigned int hour,unsigned char meridian, unsigned int minu
 
 /**********************************************************************************************************************
 *Description: Function for setting time (hour, minute and second). This function sets time retrieving values from a 
-			  local structure called local_time accessible in the class RTCInt.	
+			  local structure called time accessible in the class RTCInt.	
 *Input Parameters: None
 *Return Parameter: None
 ***********************************************************************************************************************/
 void RTCInt::setTime(void)
 {
-	setHour(local_time.hour,local_time.Tmode);
-    setMinute(local_time.minute);
-    setSecond(local_time.second);  
+	setHour(time.hour,time.Tmode);
+    setMinute(time.minute);
+    setSecond(time.second);  
 }
 
 
@@ -396,15 +405,15 @@ void RTCInt::setDate(unsigned int day, unsigned int month, unsigned int year)
 
 /**********************************************************************************************************************
 *Description: Function for setting date (day, month and year). This function retrieves values from a local structure 
-			  called local_date accessible in the class RTCInt.	
+			  called date accessible in the class RTCInt.	
 *Input Parameters: None
 *Return Parameter: None
 ***********************************************************************************************************************/
 void RTCInt::setDate(void)
 {
-	setDay(local_date.day);
-	setMonth(local_date.month);  
-    setYear(local_date.year);
+	setDay(date.day);
+	setMonth(date.month);  
+    setYear(date.year);
 }
 
 /*
@@ -460,8 +469,8 @@ void RTCInt::setDate(void)
  
  /**********************************************************************************************************************
 *Description: Function for setting alarm. This function retrieves values from two local structures 
-			  called local_date and local_time accessible in the class RTCInt. According to match alarm type, values 
-			  can be obtained from local_time, local_date or both structures.	
+			  called date and time accessible in the class RTCInt. According to match alarm type, values 
+			  can be obtained from time, date or both structures.	
 *Input Parameters: None
 *Return Parameter: None
 ***********************************************************************************************************************/
@@ -473,57 +482,57 @@ void RTCInt::setDate(void)
    case OFF :
       break;
    case SEC :
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
 	  break;	
    case MMSS :
-      RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= local_time.minute;
+      RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= time.minute;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
 	  break;
    case HHMMSS :
-      RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= local_time.hour;
+      RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= time.hour;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= local_time.minute;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= time.minute;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
       break;
    case DDHHMMSS :
-      RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= local_date.day;
+      RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= date.day;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= local_time.hour;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= time.hour;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= local_time.minute;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= time.minute;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
       break;
    case MMDDHHMMSS :
-      RTC->MODE2.Mode2Alarm->ALARM.bit.MONTH= local_date.month;
+      RTC->MODE2.Mode2Alarm->ALARM.bit.MONTH= date.month;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= local_date.day;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= date.day;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= local_time.hour;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= time.hour;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= local_time.minute;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= time.minute;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
       break;
    case YYMMDDHHMMSS :
-      RTC->MODE2.Mode2Alarm->ALARM.bit.YEAR= local_date.year;
+      RTC->MODE2.Mode2Alarm->ALARM.bit.YEAR= date.year;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.MONTH= local_date.month;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.MONTH= date.month;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= local_date.day;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.DAY= date.day;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= local_time.hour;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.HOUR= time.hour;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= local_time.minute;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.MINUTE= time.minute;
 	  while (RTCSync());
-	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= local_time.second;
+	  RTC->MODE2.Mode2Alarm->ALARM.bit.SECOND= time.second;
 	  while (RTCSync());
       break;	  
    default :

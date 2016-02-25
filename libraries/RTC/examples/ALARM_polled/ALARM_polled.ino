@@ -1,6 +1,10 @@
 /*********************************************************************************************************************************************************************************
 * This sketch demonstrates how configure alarm in polled mode.
   In this mode you hav to check continuously ALARM0 flag in the main program code.
+  
+  NOTE: for M0/M0 pro only you can select the oscillator source for count.
+If you want to use a low power oscillator use rtc.begin(TIME_H24, LOW_POWER); function.
+If you want to use a more accurate oscillator use rtc.begin(TIME_H24, HIGH_PRECISION); function.
 *********************************************************************************************************************************************************************************/  
 
 
