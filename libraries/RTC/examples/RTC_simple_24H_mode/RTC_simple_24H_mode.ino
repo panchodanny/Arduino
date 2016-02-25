@@ -37,19 +37,19 @@ void loop()
  rtc.getTime();      //getting time in local structure(local_time)
  
  //printing date in format YYYY/MM/DD
- Serial.print(rtc.local_date.year+2000); // year
+ Serial.print(rtc.date.year+2000); // year
  Serial.print('/');
- Serial.print(rtc.local_date.month);    // month
+ Serial.print(rtc.date.month);    // month
  Serial.print('/');
- Serial.print(rtc.local_date.day);      // day
+ Serial.print(rtc.date.day);      // day
  Serial.print(' ');
  
  //printing time
- Serial.print(rtc.local_time.hour);    //hour
+ Serial.print(rtc.time.hour);    //hour
  Serial.print(':');
- Serial.print(rtc.local_time.minute);  //minute
+ Serial.print(rtc.time.minute);  //minute
  Serial.print(':');
- Serial.println(rtc.local_time.second);  //second
+ Serial.println(rtc.time.second);  //second
  
  delay(1000);
 }
