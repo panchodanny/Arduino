@@ -365,31 +365,29 @@ public class Platform extends processing.app.Platform {
   
   @Override
   public List<String> sortSerialList(List<String> unsortedSerialList) {
-	try{
-		String sortedDeviceList = sortCandidateDevice( preListAllCandidateDevices() );
-		List<String> sortList = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader(new StringReader(sortedDeviceList));
-		String line;
-		while ((line = reader.readLine()) != null) {
-			int idx1 = line.indexOf('-');
-			if(idx1 > 0){
-				String key = line.substring(0, idx1).trim();
-				if(unsortedSerialList.contains(key)){
-					sortList.add(key);
-				}
-			}
-		}
-		return sortList;
-	}catch(IOException ex){
-		return unsortedSerialList;
-	}
+  	try{
+  		String sortedDeviceList = sortCandidateDevice( preListAllCandidateDevices() );
+  		List<String> sortList = new ArrayList<String>();
+  		BufferedReader reader = new BufferedReader(new StringReader(sortedDeviceList));
+  		String line;
+  		while ((line = reader.readLine()) != null) {
+  			int idx1 = line.indexOf('-');
+  			if(idx1 > 0){
+  				String key = line.substring(0, idx1).trim();
+  				if(unsortedSerialList.contains(key)){
+  					sortList.add(key);
+  				}
+  			}
+  		}
+  		return sortList;
+  	}catch(IOException ex){
+  		return unsortedSerialList;
+  	}
 	
   }
   
-    /**
-	Order Tian Devices
-	**/
-	private static String sortCandidateDevice(String unsortedDeviceList) throws IOException{
+  //Workaround #2 sort Serial Ports in order to have the CP2105 devices grouped two by two and sorted (first programming port, then console port)
+  private static String sortCandidateDevice(String unsortedDeviceList) throws IOException{
 		Map<String, String> unsortMap = new HashMap<String, String>();
 		BufferedReader reader = new BufferedReader(new StringReader(unsortedDeviceList));
 		String line;

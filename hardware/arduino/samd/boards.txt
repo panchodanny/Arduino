@@ -105,13 +105,6 @@ tian.upload.via_ssh=true
 tian.vid.0=0x10C4
 tian.pid.0=0xEA70
 
-tian.vid.1=0x10C4
-tian.pid.1=0xEA70MI_01
-
-tian.vid.2=0x10C4
-tian.pid.2=0xEA70MI_00
-
-
 tian.upload.tool=avrdude
 #tian.upload.protocol=stk500v2
 tian.upload.protocol=wiring
@@ -136,3 +129,4 @@ tian.build.emu.mcu=atmega2560
 tian.bootloader.tool=avrdude
 tian.bootloader.low_fuses=0xff
 tian.bootloader.file=sofia/Sofia_Tian_151118.hex
+tian.drivers=SiliconLabs-CP2105/Silicon Labs VCP Driver.pkg

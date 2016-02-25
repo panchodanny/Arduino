@@ -58,6 +58,11 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.uploaders.SerialUploader;
 
+import processing.app.PreferencesData;
+import processing.app.debug.TargetPlatform;
+import processing.app.helpers.PreferencesMap;
+
+
 /**
  * Main editor panel for the Processing Development Environment.
  */
@@ -749,6 +754,36 @@ public class Editor extends JFrame implements RunnerListener {
       }
     });
 
+
+    if (OSUtils.isMacOS()) {
+      menu.addSeparator();
+      item = new JMenuItem(_("Install Driver"));
+      item.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            try{
+              TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
+              PreferencesMap prefs = PreferencesData.getMap();
+              PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+              if(boardPreferences.get("drivers") != null && !boardPreferences.get("drivers").trim().isEmpty()){
+                File driverFile = new File(prefs.get("runtime.ide.path") + "/hardware/tools/drivers/", boardPreferences.get("drivers"));
+                if(driverFile.exists()){
+                  Platform os = BaseNoGui.getPlatform();
+                  os.openFolder(driverFile);
+                }
+                else{
+                  Base.showWarning( _("File not found"), _("No driver file found."), null);
+                }
+              }
+              else{
+                Base.showMessage( _("Driver not need"), _("No driver needed for the selected board."));
+              }
+            }
+            catch(Exception ex) {
+            }
+          }
+        });
+      menu.add(item);
+    }
     return menu;
   }
 
@@ -1164,7 +1199,6 @@ public class Editor extends JFrame implements RunnerListener {
         });
       menu.add(item);
     }
-
     return menu;
   }
 
