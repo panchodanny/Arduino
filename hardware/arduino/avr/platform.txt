@@ -98,7 +98,7 @@ tools.espota.erase.pattern=""
 
 tools.espota.bootloader.params.verbose=-v
 tools.espota.bootloader.params.quiet=-q
-tools.espota.bootloader.pattern="{path}/{cmd}" {serial.port} "{runtime.platform.path}/firmwares/{bootloader.file1}" "{runtime.platform.path}/firmwares/{bootloader.file2}"
+tools.espota.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} {serial.port} "{runtime.platform.path}/firmwares/{bootloader.file1}" "{runtime.platform.path}/firmwares/{bootloader.file2}"
 
 # AVR Uploader/Programmers tools
 # ------------------------------
