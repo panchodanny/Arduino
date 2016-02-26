@@ -18,17 +18,22 @@ public class SystemProfilerParser {
   private static final String DEV_CU_USBSERIAL = "/dev/cu.usbserial-";
   private static final String DEV_TTY_USBMODEM = "/dev/tty.usbmodem";
   private static final String DEV_CU_USBMODEM = "/dev/cu.usbmodem";
+  private static final String DEV_TTY_SLAB = "/dev/tty.SLAB_USBtoUART";
+  
+  private static final String MAN_SLAB = "Silicon Labs";
 
   private final Pattern vidRegex;
   private final Pattern serialNumberRegex;
   private final Pattern locationRegex;
   private final Pattern pidRegex;
+  private final Pattern manufacturerRegex;
 
   public SystemProfilerParser() {
     this.serialNumberRegex = Pattern.compile("^Serial Number: (.+)$");
     this.locationRegex = Pattern.compile("^Location ID: (.+)$");
     this.pidRegex = Pattern.compile("^Product ID: (.+)$");
     this.vidRegex = Pattern.compile("^Vendor ID: (.+)$");
+    this.manufacturerRegex = Pattern.compile("^Manufacturer: (.+)$");
   }
 
   public String extractVIDAndPID(String output, String serial) throws IOException {
@@ -41,14 +46,17 @@ public class SystemProfilerParser {
       devicePrefix = DEV_CU_USBSERIAL;
     } else if (serial.startsWith(DEV_TTY_USBMODEM)) {
       devicePrefix = DEV_TTY_USBMODEM;
-    } else {
+    } else if (serial.startsWith(DEV_CU_USBMODEM)){
       devicePrefix = DEV_CU_USBMODEM;
+    } else  /*(serial.startsWith(DEV_TTY_SLAB))*/{
+      devicePrefix = DEV_TTY_SLAB;
     }
 
     Map<String, String> device = new HashMap<String, String>();
 
     String line;
     Matcher matcher;
+
     while ((line = reader.readLine()) != null) {
       line = line.trim();
       line = line.replaceAll("\\s+", " ");
@@ -57,13 +65,17 @@ public class SystemProfilerParser {
         device.put(SERIAL_NUMBER, matcher.group(1));
         if ((serial.startsWith(DEV_TTY_USBSERIAL) || serial.startsWith(DEV_CU_USBSERIAL))) {
           String devicePath = devicePrefix + matcher.group(1);
-          device.put(DEVICE_PATH, devicePath);
+          device.put(DEVICE_PATH, devicePath); 
         }
       } else if ((serial.startsWith(DEV_TTY_USBMODEM) || serial.startsWith(DEV_CU_USBMODEM)) && (matcher = locationRegex.matcher(line)).matches()) {
         String suffix = matcher.group(1).substring(2, 6).replaceAll("0", "");
         String devicePath = devicePrefix + suffix + "1";
         device.put(DEVICE_PATH, devicePath);
-      } else if ((matcher = pidRegex.matcher(line)).matches()) {
+      } else if (serial.startsWith(DEV_TTY_SLAB) && (matcher = manufacturerRegex.matcher(line)).matches()){
+        if(matcher.group(1).trim().replaceAll("\\s+", " ").equals(MAN_SLAB)){
+          device.put(DEVICE_PATH, serial);
+        }
+      }  else if ((matcher = pidRegex.matcher(line)).matches()) {
         String pid = matcher.group(1);
         if (pid.indexOf(" ") > 0)
           pid = pid.substring(0, pid.indexOf(" ")); // Remove any text after the hex number
@@ -78,9 +90,8 @@ public class SystemProfilerParser {
           return (device.get(VID) + "_" + device.get(PID)).toUpperCase();
         }
         device = new HashMap<String, String>();
-      }
+      } 
     }
-
     return null;
   }
 

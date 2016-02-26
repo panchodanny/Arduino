@@ -417,6 +417,11 @@
     <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/avrflash" />
     <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/wiflash" />
 
+
+    <copy todir="macosx/work/${staging_hardware_folder}/tools">
+      <fileset dir="macosx/dist" includes="drivers/**" />
+    </copy>
+
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
