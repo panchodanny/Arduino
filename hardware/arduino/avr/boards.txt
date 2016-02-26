@@ -158,8 +158,8 @@ unowifi.build.variant=standard
 unowifi_ota_esp.name=Arduino Uno WiFi - ESP Bootloader
 
 unowifi_ota_esp.bootloader.tool=espota
-unowifi_ota_esp.bootloader.file1=esp8266/firmware_arduino_esp8266_2016_02_11_file1.bin
-unowifi_ota_esp.bootloader.file2=esp8266/firmware_arduino_esp8266_2016_02_11_file2.bin
+unowifi_ota_esp.bootloader.file1=esp8266/firmware_arduino_esp8266_2016_02_26_file1.bin
+unowifi_ota_esp.bootloader.file2=esp8266/firmware_arduino_esp8266_2016_02_26_file2.bin
 unowifi_ota_esp.build.board=ESP_MODULE_UNO
 
 ##############################################################
