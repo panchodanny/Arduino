@@ -69,7 +69,6 @@ extern "C" {
 #define udd_ack_in_received(ep)                   USB->DEVICE.DeviceEndpoint[ep].EPSTATUSCLR.reg = USB_DEVICE_EPSTATUSCLR_BK1RDY
 // Is transfert completed ?
 #define udd_is_transf_cplt(ep)                   (USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT1)
-#define udd_is_OUT_transf_cplt(ep)				 (USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.reg & USB_DEVICE_EPINTFLAG_TRCPT(1))	//aggiunto bar
 // Clear the transfer complete flag
 #define udd_clear_transf_cplt(ep)                 USB->DEVICE.DeviceEndpoint[ep].EPINTFLAG.bit.TRCPT1 = 1
 // Set the bank as ready

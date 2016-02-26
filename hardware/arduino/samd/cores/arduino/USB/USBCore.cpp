@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-//#include "Arduino.h" //bar
+//#include "../Arduino.h"
 
 #include "sam.h"
 #include "wiring_constants.h"
@@ -117,92 +117,43 @@ uint32_t USBD_Available(uint32_t ep)
 
 //	Non Blocking receive
 //	Return number of bytes read
-//uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
-//{
-	
-	
-	//SerialUSB.print("len inizio funzione: ");
-	//SerialUSB.println(len);
-	//if (!_usbConfiguration || len < 0)  //rivedere questo controllo (bar)
-		//return -1;
-	
-	//if (!_usbConfiguration)  //modificato (bar)
-	//	return -1;	
-
-	//uint32_t n = UDD_FifoByteCount(ep);  //problemi con questa funzione   //capire perchè ci vuole questa funzione  //questa funzione crea problemi
-	//SerialUSB.print("n fifobytecount: ");  //bar
-	//SerialUSB.println(n);   //bar
-	//len = min(n,len);   //sembra che sia indispensabile
-	//SerialUSB.print("len prima di min: ");
-	//SerialUSB.println(len);
-	//n = len;
-	//n=1; //bar
-	//uint8_t* dst = (uint8_t*)d;   //casting auint8_t *
-	
-	/*for(unsigned int i=0; i < len; i++)  //aggiunto bar
-	{
-		*dst++ = UDD_Recv8(ep);
-		SerialUSB.print("dst: ");
-		SerialUSB.println(*dst);
-	}  //fine aggiunto bar*/
-//while (n--) //ciclo while per ricevere i byte
-	//{
-		
-		//*dst++ = UDD_Recv8(ep);   //vedere questa funzione
-		
-	//}	
-	//if (len && !UDD_FifoByteCount(ep))  //se non ci sono più byte rilascio la linea RX
-	//{
-		//SerialUSB.println("non ci sono byte");   //bar
-		// release empty buffer
-		//UDD_ReleaseRX(ep);
-	//}	
-	//SerialUSB.print("len prima di return: ");  //bar
-	//SerialUSB.println(len);  //bar
-	//return len;  //ritorno len
-//}
-
-
-uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)  //implementazione cc
+uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 {
-	if(!_usbConfiguration && (len > 0))
+	if (!_usbConfiguration || len < 0)
 		return -1;
-	
-	uint8_t *buffer;
-	uint8_t *data = (uint8_t *)d;
-	
-	len=min(UDD_FifoByteCount(ep), len);
-	
-	UDD_Recv8(ep,len);
-	UDD_Recv(ep, &buffer);
-	for(uint32_t i = 0; i < len; i++)
-	{
-		data[i] = buffer[i];
-	}
-	
-	if(len && !UDD_FifoByteCount(ep))
-		UDD_ReleaseRX(ep);
-	
-	return len;
-}  //implementazione cc
 
+	uint32_t n = UDD_FifoByteCount(ep);
+	len = min(n,len);
+	n = len;
+	uint8_t* dst = (uint8_t*)d;
+	while (n--)
+		*dst++ = UDD_Recv8(ep);
+	
+	
+	
+	
+	if (len && !UDD_FifoByteCount(ep)) // release empty buffer
+		UDD_ReleaseRX(ep);
+		
+  //----- Tx & Rx led blinking during transmission ----- begin ----	
+	PORT->Group[1].OUTTGL.reg =0x00000008 ;  //RxLED
+	for(int i=0; i < 100000; i++)
+	{
+		asm("NOP");
+	}
+	PORT->Group[1].OUTTGL.reg =0x00000008 ;	
+  //----- Tx & Rx led blinking during transmission ----- end ----
+	return len;
+}
 
 //	Recv 1 byte if ready
 uint32_t USBD_Recv(uint32_t ep)
 {
 	uint8_t c;
-	if(USBD_Recv(ep, &c, 1) != 1)
-	{	
-			//SerialUSB.println("CIAO"); //bar
-	return -1;
-	}
+	if (USBD_Recv(ep, &c, 1) != 1)
+		return -1;
 	else
-	{
-		//SerialUSB.write(c); //bar
-		//SerialUSB.println("");  //bar
 		return c;
-	}
-		//return c;
 }
 
 //	Blocking Send of data to an endpoint
@@ -225,6 +176,19 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 
 	/* Wait for transfer to complete */
 	while (! udd_is_transf_cplt(ep));  // need fire exit.
+	
+  //----- Tx & Rx led blinking during transmission ----- begin ----
+	PORT->Group[0].OUTTGL.reg =0x08000000 ; //TxLED
+	for(int i=0; i < 100000; i++)
+	{
+		asm("NOP");
+	}
+	PORT->Group[0].OUTTGL.reg =0x08000000 ;
+	/*for(int i=0; i < 100000; i++)
+	{
+		asm("NOP");
+	}*/
+  //----- Tx & Rx led blinking during transmission ----- end ----	
 	return r;
 }
 
@@ -470,21 +434,16 @@ static bool USBD_SendDescriptor(Setup* pSetup)
 
 void EndpointHandler(uint8_t bEndpoint)
 {
-	unsigned int n=0;  //bar
 #ifdef CDC_ENABLED
 	if( bEndpoint == CDC_ENDPOINT_OUT )
 	{
-		udd_ack_out_received(CDC_ENDPOINT_OUT);  //si modifica bar
-		
-		//SerialUSB.println("Byte ricevuti Interrupt OUT");  //bar
+		udd_ack_out_received(CDC_ENDPOINT_OUT);
+
 		// Handle received bytes		
-		if (n=USBD_Available(CDC_ENDPOINT_OUT))
+		if (USBD_Available(CDC_ENDPOINT_OUT))
 		{
-			//SerialUSB.print("n= ");  //bar
-			//SerialUSB.println(n);  //bar
 			SerialUSB.accept();
 		}
-		//udd_ack_out_received(CDC_ENDPOINT_OUT);
 	}
 	if( bEndpoint == CDC_ENDPOINT_IN )
 	{
@@ -728,7 +687,6 @@ void USB_Handler(void)
 				if( (udd_read_endpoint_flag(i) & USB_DEVICE_EPINTFLAG_TRCPT_Msk ) != 0 )
 				
 				{
-					//SerialUSB.println("interrupt per endpoint handler");  //bar
 					EndpointHandler(i);
 				}
                 ept_int &= ~(1 << i);

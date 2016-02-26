@@ -66,7 +66,7 @@ public:
 	void end(void);
 
 	virtual int available(void);
-	virtual void accept(void);   
+	virtual void accept(void);
 	virtual int peek(void);
 	virtual int read(void);
 	virtual void flush(void);
