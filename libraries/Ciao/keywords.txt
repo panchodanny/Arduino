@@ -20,4 +20,5 @@ available	KEYWORD2
 read	KEYWORD2
 write	KEYWORD2
 bool	KEYWORD2
+wifi	KEYWORD2
 
