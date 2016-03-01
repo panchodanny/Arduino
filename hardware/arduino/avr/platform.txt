@@ -83,7 +83,7 @@ tools.mcuota.cmd.windows=avrflash.cmd
 
 tools.mcuota.upload.params.verbose=-v
 tools.mcuota.upload.params.quiet=
-tools.mcuota.upload.pattern="{path}/{cmd}" {upload.verbose} {serial.port} "{build.path}/{build.project_name}.hex"
+tools.mcuota.upload.pattern="{path}/{cmd}" {upload.verbose} {board.ipaddress} "{build.path}/{build.project_name}.hex"
 
 #Upload firmware to esp8266 via ota
 
@@ -98,7 +98,7 @@ tools.espota.erase.pattern=""
 
 tools.espota.bootloader.params.verbose=-v
 tools.espota.bootloader.params.quiet=-q
-tools.espota.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} {serial.port} "{runtime.platform.path}/firmwares/{bootloader.file1}" "{runtime.platform.path}/firmwares/{bootloader.file2}"
+tools.espota.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} {serial.port} "{runtime.platform.path}/firmwares/{bootloader.esp.file1}" "{runtime.platform.path}/firmwares/{bootloader.esp.file2}"
 
 # AVR Uploader/Programmers tools
 # ------------------------------
