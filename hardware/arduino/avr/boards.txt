@@ -1,7 +1,6 @@
 # See: http://code.google.com/p/arduino/wiki/Platforms
 
 menu.cpu=Processor
-menu.upload=Upload Using:
 
 ##############################################################
 
@@ -124,13 +123,12 @@ unowifi.name=Arduino Uno WiFi
 unowifi.vid.0=0x2A03
 unowifi.pid.0=0x0057
 
-## ---- UNO WIFI - MCU ----
+## ---- UNO WIFI - OTA ----
 
-unowifi.menu.upload.serial=via Serial
-unowifi.menu.upload.serial.upload.tool=avrdude
+unowifi.upload.via_ota=true
+unowifi.upload.via_ota.tool=mcuota
 
-unowifi.menu.upload.mcuota=via OTA
-unowifi.menu.upload.mcuota.upload.tool=mcuota
+## ---- UNO WIFI - USB ----
 
 unowifi.upload.tool=avrdude
 unowifi.upload.protocol=arduino
@@ -146,21 +144,14 @@ unowifi.bootloader.unlock_bits=0x3F
 unowifi.bootloader.lock_bits=0x0F
 unowifi.bootloader.file=optiboot/optiboot_atmega328.hex
 
+unowifi.bootloader.esp.file1=esp8266/unowifi/firmware_arduino_esp8266_2016_02_26_file1.bin
+unowifi.bootloader.esp.file2=esp8266/unowifi/firmware_arduino_esp8266_2016_02_26_file2.bin
+
 unowifi.build.mcu=atmega328p
 unowifi.build.f_cpu=16000000L
-unowifi.build.board=AVR_UNO
+unowifi.build.board=AVR_UNO_WIFI
 unowifi.build.core=arduino
 unowifi.build.variant=standard
-
-## ---- UNO WIFI - ESP FIRMWARE ----
-## Upload the firmware of the ESP8266 Module via OTA
-
-unowifi_ota_esp.name=Arduino Uno WiFi - ESP Bootloader
-
-unowifi_ota_esp.bootloader.tool=espota
-unowifi_ota_esp.bootloader.file1=esp8266/firmware_arduino_esp8266_2016_02_26_file1.bin
-unowifi_ota_esp.bootloader.file2=esp8266/firmware_arduino_esp8266_2016_02_26_file2.bin
-unowifi_ota_esp.build.board=ESP_MODULE_UNO
 
 ##############################################################
 
