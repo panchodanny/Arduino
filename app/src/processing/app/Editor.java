@@ -2592,6 +2592,11 @@ public class Editor extends JFrame implements RunnerListener {
     serialMonitor = new MonitorFactory().newMonitor(port);
     serialMonitor.setIconImage(getIconImage());
 
+    if(serialMonitor instanceof processing.app.EspLinkMonitor){//TEMPORARY
+        return;
+    }
+
+
     boolean success = false;
     do {
       if (serialMonitor.requiresAuthorization() && !Preferences.has(serialMonitor.getAuthorizationKey())) {
@@ -2637,6 +2642,35 @@ public class Editor extends JFrame implements RunnerListener {
   protected void handleBurnBootloader() {
     console.clear();
     statusNotice(_("Burning bootloader to I/O Board (this may take a minute)..."));
+
+    //Non-Blocking UI
+    /*
+    new Thread(
+      new Runnable() {
+        public void run() {
+          try {
+            Uploader uploader = new SerialUploader();
+            if (uploader.burnBootloader()) {
+              statusNotice(_("Done burning bootloader."));
+            } else {
+              statusError(_("Error while burning bootloader."));
+              // error message will already be visible
+            }
+          } catch (PreferencesMapException e) {
+            statusError(I18n.format(
+                        _("Error while burning bootloader: missing '{0}' configuration parameter"),
+                        e.getMessage()));
+          } catch (RunnerException e) {
+            statusError(e.getMessage());
+          } catch (Exception e) {
+            statusError(_("Error while burning bootloader."));
+            e.printStackTrace();
+          }
+        }
+    } ).start();
+    */
+
+    //Blocking UI
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
