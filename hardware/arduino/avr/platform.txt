@@ -9,7 +9,7 @@ name=Arduino AVR Boards
 version=1.7.0
 
 # AVR compile variables
-# --------------------- 
+# ---------------------
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
 compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
@@ -93,11 +93,11 @@ tools.espota.cmd=wiflash
 tools.espota.cmd.windows=wiflash.cmd
 
 tools.espota.erase.params.verbose=-v
-tools.espota.erase.params.quiet=-q
+tools.espota.erase.params.quiet=
 tools.espota.erase.pattern=""
 
 tools.espota.bootloader.params.verbose=-v
-tools.espota.bootloader.params.quiet=-q
+tools.espota.bootloader.params.quiet=
 tools.espota.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} {serial.port} "{runtime.platform.path}/firmwares/{bootloader.esp.file1}" "{runtime.platform.path}/firmwares/{bootloader.esp.file2}"
 
 # AVR Uploader/Programmers tools
