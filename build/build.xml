@@ -409,8 +409,8 @@
 
     <!-- Unzip Esp-Link-Tools -->
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.0-arduino-unix.tar.bz2" />
-      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.0-arduino-unix.tar.bz2" />
+      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
@@ -662,8 +662,8 @@
 
     <!-- Unzip Esp-Link-Tools -->
     <antcall target="untar">
-        <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.0-arduino-unix.tar.bz2" />
-        <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.0-arduino-unix.tar.bz2" />
+        <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+        <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
         <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
         <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
@@ -984,12 +984,12 @@
 
     <!-- Unzip AVR-FLASH ESP-LINK -->
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.0-arduino-win32.tar.bz2" />
-      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.0-arduino-win32.tar.bz2" />
+      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-win32.tar.bz2" />
+      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-win32.tar.bz2" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
-	
+
     <!-- setting permissions to esp-link-tools -->
     <chmod perm="755">
       <fileset dir="windows/work/hardware/tools/esp-link-tools" includes="**/*.cmd, **/*.*" />

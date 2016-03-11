@@ -157,6 +157,9 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
         if( info.getPropertyString("tcp_check")!= null ){
           prefs.put("tcp_check", info.getPropertyString("tcp_check"));
         }
+        if( info.getPropertyString("distro_name")!= null ){
+          prefs.put("distro_name", info.getPropertyString("distro_name"));
+        }
       }
 
       prefs.put("port", "" + info.getPort());
