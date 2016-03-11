@@ -144,8 +144,8 @@ unowifi.bootloader.unlock_bits=0x3F
 unowifi.bootloader.lock_bits=0x0F
 unowifi.bootloader.file=optiboot/optiboot_atmega328.hex
 
-unowifi.bootloader.esp.file1=esp8266/unowifi/firmware_arduino_esp8266_2016_02_26_file1.bin
-unowifi.bootloader.esp.file2=esp8266/unowifi/firmware_arduino_esp8266_2016_02_26_file2.bin
+unowifi.bootloader.esp.file1=esp8266/unowifi/firmware_arduino_esp8266_2016_03_04_file1.bin
+unowifi.bootloader.esp.file2=esp8266/unowifi/firmware_arduino_esp8266_2016_03_04_file2.bin
 
 unowifi.build.mcu=atmega328p
 unowifi.build.f_cpu=16000000L
