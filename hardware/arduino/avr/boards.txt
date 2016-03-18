@@ -82,6 +82,43 @@ yunmini.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
+chiwawa.name=Arduino Industrial 101
+chiwawa.upload.via_ssh=true
+
+chiwawa.vid.0=0x2a03
+chiwawa.pid.0=0x0056
+chiwawa.vid.1=0x2a03
+chiwawa.pid.1=0x8056
+
+chiwawa.upload.tool=avrdude
+chiwawa.upload.protocol=avr109
+chiwawa.upload.maximum_size=28672
+chiwawa.upload.maximum_data_size=2560
+chiwawa.upload.speed=57600
+chiwawa.upload.disable_flushing=true
+chiwawa.upload.use_1200bps_touch=true
+chiwawa.upload.wait_for_upload_port=true
+
+chiwawa.bootloader.tool=avrdude
+chiwawa.bootloader.low_fuses=0xff
+chiwawa.bootloader.high_fuses=0xd8
+chiwawa.bootloader.extended_fuses=0xfb
+chiwawa.bootloader.file=caterina/Caterina-Industrial101.hex
+chiwawa.bootloader.unlock_bits=0x3F
+chiwawa.bootloader.lock_bits=0x2F
+
+chiwawa.build.mcu=atmega32u4
+chiwawa.build.f_cpu=16000000L
+chiwawa.build.vid=0x2a03
+chiwawa.build.pid=0x8056
+chiwawa.build.usb_product="Arduino Industrial 101"
+chiwawa.build.board=AVR_YUN
+chiwawa.build.core=arduino
+chiwawa.build.variant=yun
+chiwawa.build.extra_flags={build.usb_flags}
+
+##############################################################
+
 one.name=Linino One
 one.upload.via_ssh=true
 
@@ -868,4 +905,3 @@ robotMotor.build.board=AVR_ROBOT_MOTOR
 robotMotor.build.core=arduino
 robotMotor.build.variant=robot_motor
 robotMotor.build.extra_flags={build.usb_flags}
-
