@@ -37,9 +37,9 @@ import processing.app.packages.LibraryList;
 public class BaseNoGui {
 
   /** Version string to be used for build */
-  public static final int REVISION = 10708;
+  public static final int REVISION = 10709;
   /** Extended version string displayed on GUI */
-  static String VERSION_NAME = "1.7.8";
+  static String VERSION_NAME = "1.7.9";
 
   static File buildFolder;
 
@@ -48,7 +48,7 @@ public class BaseNoGui {
   static String currentDirectory = System.getProperty("user.dir");
 
   private static DiscoveryManager discoveryManager = new DiscoveryManager();
-  
+
   // these are static because they're used by Sketch
   static private File examplesFolder;
   static private File toolsFolder;
@@ -150,7 +150,7 @@ public class BaseNoGui {
     if (board == null)
       return null;
     String boardId = board.getId();
-    
+
     PreferencesMap prefs = new PreferencesMap(board.getPreferences());
 
     String extendedName = prefs.get("name");
@@ -423,9 +423,9 @@ public class BaseNoGui {
 
   static public void init(String[] args) {
     getPlatform().init();
-  
+
     String sketchbookPath = getSketchbookPath();
-  
+
     // If no path is set, get the default sketchbook folder for this platform
     if (sketchbookPath == null) {
       if (BaseNoGui.getPortableFolder() != null)
@@ -433,18 +433,18 @@ public class BaseNoGui {
       else
         showError(_("No sketchbook"), _("Sketchbook path not defined"), null);
     }
-  
+
     BaseNoGui.initPackages();
-    
+
     // Setup board-dependent variables.
     onBoardOrPortChange();
-  
+
     CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
 
     for (String path: parser.getFilenames()) {
       // Correctly resolve relative paths
       File file = absoluteFile(path);
-  
+
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
       // unhappy, since the sketch folder naming doesn't match up correctly.
@@ -468,7 +468,7 @@ public class BaseNoGui {
         showError(null, mess, 2);
       }
     }
-  
+
     // Save the preferences. For GUI mode, this happens in the quit
     // handler, but for other modes we should also make sure to save
     // them.
@@ -512,7 +512,7 @@ public class BaseNoGui {
           if (suggestedClassName == null) showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), null);
           showMessage(_("Done compiling"), _("Done compiling"));
 
-          //  - chiama Sketch.upload() ... to be continued ...        
+          //  - chiama Sketch.upload() ... to be continued ...
           Uploader uploader = Compiler.getUploaderByPreferences(parser.isNoUploadPort());
           if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) showError("...", "...", null);
           try {
@@ -647,7 +647,7 @@ public class BaseNoGui {
       if (target.equals("tools"))
         continue;
       File subfolder = new File(folder, target);
-      
+
       try {
         packages.put(target, new TargetPackage(target, subfolder));
       } catch (TargetPlatformException e) {
@@ -671,11 +671,11 @@ public class BaseNoGui {
       showError(_("No parameters"), _("No command line parameters found"), null);
 
     initPlatform();
-    
+
     initPortableFolder();
-    
+
     initParameters(args);
-    
+
     init(args);
   }
 

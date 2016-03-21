@@ -79,7 +79,7 @@ void init( void )
   ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV128 |     // Divide Clock by 128.
                    ADC_CTRLB_RESSEL_10BIT;          // Result on 10 bits
     ADC->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND | // No Negative input (Internal Ground)
-                         ADC_INPUTCTRL_GAIN_1X;     // Gain setted to 1
+                         ADC_INPUTCTRL_GAIN_DIV2;     // Gain setted to 1/2
   // Averaging (see table 31-2 p.816 datasheet)
   ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_2 |      // 2 samples
                      ADC_AVGCTRL_ADJRES(0x01ul);    // Adjusting result by 1
