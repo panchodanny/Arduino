@@ -181,7 +181,7 @@ public class Compiler implements MessageConsumer {
   public Compiler(SketchData _sketch, String _buildPath, String _primaryClassName)
       throws RunnerException {
     sketch = _sketch;
-    prefs = createBuildPreferences(_buildPath, _primaryClassName);
+    prefs = createBuildPreferences(_buildPath, _primaryClassName, sketch);
 
     // Start with an empty progress listener
     progressListener = new ProgressListener() {
@@ -417,7 +417,8 @@ public class Compiler implements MessageConsumer {
   }
 
   private PreferencesMap createBuildPreferences(String _buildPath,
-                                                String _primaryClassName)
+                                                String _primaryClassName,
+                                                SketchData _sketch)
       throws RunnerException {
     
     if (BaseNoGui.getBoardPreferences() == null) {
@@ -502,6 +503,32 @@ public class Compiler implements MessageConsumer {
       p.put("build.variant.path", "");
     }
     
+    // Look for buildprefs.txt in sketch folder. Restrict overriding
+    // options to a selected compiler options so that macros can be
+    // defined on the command line.
+    File sketchPrefsFile = new File(_sketch.getFolder(), "buildprefs.txt");
+    if (sketchPrefsFile.exists()) {
+        try {
+          PreferencesMap sketchPrefs = new PreferencesMap(sketchPrefsFile);
+          boolean verbose = PreferencesData.getBoolean("build.verbose");
+          List<String> keys = Arrays.asList("compiler.c.extra_flags", 
+                                            "compiler.cpp.extra_flags");
+          for (String key : keys) {
+            String val = sketchPrefs.get(key);
+            if (val != null) {
+              p.put(key, val);
+              if (verbose)
+                System.out.println("Using " + key + " from " 
+                                   + sketchPrefsFile.getAbsolutePath());
+            }
+          }
+          
+        } catch (IOException e) {
+          RunnerException re = new RunnerException(_("Could not read " + sketchPrefsFile.getAbsolutePath()));
+          throw re;
+        }
+      }
+
     return p;
   }
 
