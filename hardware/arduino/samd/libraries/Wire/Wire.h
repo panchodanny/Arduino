@@ -1,7 +1,6 @@
 /*
- * TwoWire.h - TWI/I2C library for Arduino Due
- * Copyright (c) 2011 Cristian Maglie <c.maglie@bug.st>.
- * All rights reserved.
+ * TWI/I2C library for Arduino Zero
+ * Copyright (c) 2015 Arduino LLC. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +20,6 @@
 #ifndef TwoWire_h
 #define TwoWire_h
 
-//#include <include/twi.h>
-
 #include "Stream.h"
 #include "variant.h"
 
@@ -31,77 +28,101 @@
 
 #define BUFFER_LENGTH 32
 
+ // WIRE_HAS_END means Wire has end()
+#define WIRE_HAS_END 1
 
 class TwoWire : public Stream
 {
-	public:
-		TwoWire(SERCOM *s);
-		void begin();
-		void begin(uint8_t);
+  public:
+    TwoWire(SERCOM *s, uint8_t pinSDA, uint8_t pinSCL);
+    void begin();
+    void begin(uint8_t);
+    void end();
+    void setClock(uint32_t);
 
-		void beginTransmission(uint8_t);
-		uint8_t endTransmission(bool stopBit);
-		uint8_t endTransmission(void);
+    void beginTransmission(uint8_t);
+    uint8_t endTransmission(bool stopBit);
+    uint8_t endTransmission(void);
 
-		uint8_t requestFrom(uint8_t address, size_t quantity, bool stopBit);
-		uint8_t requestFrom(uint8_t address, size_t quantity);
+    uint8_t requestFrom(uint8_t address, size_t quantity, bool stopBit);
+    uint8_t requestFrom(uint8_t address, size_t quantity);
 
-		size_t write(uint8_t data);
-		size_t write(const uint8_t * data, size_t quantity);
+    size_t write(uint8_t data);
+    size_t write(const uint8_t * data, size_t quantity);
 
-		virtual int available(void);
-		virtual int read(void);
-		virtual int peek(void);
-		virtual void flush(void);
-		void onReceive(void(*)(int));
-		void onRequest(void(*)(void));
+    virtual int available(void);
+    virtual int read(void);
+    virtual int peek(void);
+    virtual void flush(void);
+    void onReceive(void(*)(int));
+    void onRequest(void(*)(void));
 
-		using Print::write;
+    using Print::write;
 
-		void onService(void);
+    void onService(void);
 
-	private:
-		SERCOM * sercom;
-		bool transmissionBegun;
+  private:
+    SERCOM * sercom;
+    uint8_t _uc_pinSDA;
+    uint8_t _uc_pinSCL;
 
-		// RX Buffer
-		RingBuffer rxBuffer;
+    bool transmissionBegun;
 
-		//TX buffer
-		RingBuffer txBuffer;
-		uint8_t txAddress;
+    // RX Buffer
+    RingBuffer rxBuffer;
+
+    //TX buffer
+    RingBuffer txBuffer;
+    uint8_t txAddress;
 
 
-		// Service buffer
-		//uint8_t srvBuffer[BUFFER_LENGTH];
-		//uint8_t srvBufferIndex;
-		//uint8_t srvBufferLength;
+    // Service buffer
+    //uint8_t srvBuffer[BUFFER_LENGTH];
+    //uint8_t srvBufferIndex;
+    //uint8_t srvBufferLength;
 
-		// Callback user functions
-		void (*onRequestCallback)(void);
-		void (*onReceiveCallback)(int);
+    // Callback user functions
+    void (*onRequestCallback)(void);
+    void (*onReceiveCallback)(int);
 
-		// TWI state
-		//enum TwoWireStatus
+    // TWI state
+    //enum TwoWireStatus
     //{
-		//	UNINITIALIZED,
-		//	MASTER_IDLE,
-		//	MASTER_SEND,
-		//	MASTER_RECV,
-		//	SLAVE_IDLE,
-		//	SLAVE_RECV,
-		//	SLAVE_SEND
-		//};
-		//TwoWireStatus status;
+    //  UNINITIALIZED,
+    //  MASTER_IDLE,
+    //  MASTER_SEND,
+    //  MASTER_RECV,
+    //  SLAVE_IDLE,
+    //  SLAVE_RECV,
+    //  SLAVE_SEND
+    //};
+    //TwoWireStatus status;
 
-		// TWI clock frequency
-		static const uint32_t TWI_CLOCK = 100000;
+    // TWI clock frequency
+    static const uint32_t TWI_CLOCK = 100000;
 
-		// Timeouts
-		//static const uint32_t RECV_TIMEOUT = 100000;
-		//static const uint32_t XMIT_TIMEOUT = 100000;
+    // Timeouts
+    //static const uint32_t RECV_TIMEOUT = 100000;
+    //static const uint32_t XMIT_TIMEOUT = 100000;
 };
 
-extern TwoWire Wire;
+#if WIRE_INTERFACES_COUNT > 0
+  extern TwoWire Wire;
+#endif
+#if WIRE_INTERFACES_COUNT > 1
+  extern TwoWire Wire1;
+#endif
+#if WIRE_INTERFACES_COUNT > 2
+  extern TwoWire Wire2;
+#endif
+#if WIRE_INTERFACES_COUNT > 3
+  extern TwoWire Wire3;
+#endif
+#if WIRE_INTERFACES_COUNT > 4
+  extern TwoWire Wire4;
+#endif
+#if WIRE_INTERFACES_COUNT > 5
+  extern TwoWire Wire5;
+#endif
 
 #endif
