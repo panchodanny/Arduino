@@ -1,6 +1,10 @@
 /**********************************************************************************************************************************************************
 This sketch gives a simple demonstration of how to use RTC library.
 The code sets date and time using internal structure and then print on serial date and time. Time representation is 24 hour mode
+
+NOTE: for M0/M0 pro only you can select the oscillator source for count.
+If you want to use a low power oscillator use rtc.begin(TIME_H24, LOW_POWER); function.
+If you want to use a more accurate oscillator use rtc.begin(TIME_H24, HIGH_PRECISION); function.
 **********************************************************************************************************************************************************/
 
 
@@ -33,19 +37,19 @@ void loop()
  rtc.getTime();      //getting time in local structure(local_time)
  
  //printing date in format YYYY/MM/DD
- Serial.print(rtc.local_date.year+2000); // year
+ Serial.print(rtc.date.year+2000); // year
  Serial.print('/');
- Serial.print(rtc.local_date.month);    // month
+ Serial.print(rtc.date.month);    // month
  Serial.print('/');
- Serial.print(rtc.local_date.day);      // day
+ Serial.print(rtc.date.day);      // day
  Serial.print(' ');
  
  //printing time
- Serial.print(rtc.local_time.hour);    //hour
+ Serial.print(rtc.time.hour);    //hour
  Serial.print(':');
- Serial.print(rtc.local_time.minute);  //minute
+ Serial.print(rtc.time.minute);  //minute
  Serial.print(':');
- Serial.println(rtc.local_time.second);  //second
+ Serial.println(rtc.time.second);  //second
  
  delay(1000);
 }

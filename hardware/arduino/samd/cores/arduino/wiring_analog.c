@@ -56,9 +56,6 @@ static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
 
 void analogReference( eAnalogReference ulMode )
 {
-
-  // ATTENTION : On this board the default is not 5volts or 3.3volts BUT 1.65 volt
-
    
    
    ADC->CTRLA.bit.ENABLE = 0; // Enable ADC
