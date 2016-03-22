@@ -30,12 +30,12 @@
 #ifndef Lucky_h
 #define Lucky_h
 
-#include <CAT9555.h>
-#include <MMA8491Q.h>
-#include <MAG3110.h>
-#include <BME280.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "lib/CAT9555.h"
+#include "lib/MMA8491Q.h"
+#include "lib/MAG3110.h"
+#include "lib/BME280.h"
+#include "lib/Adafruit_GFX.h"
+#include "lib/Adafruit_SSD1306.h"
 #include <Arduino.h>
 #include "Wire.h"
 
