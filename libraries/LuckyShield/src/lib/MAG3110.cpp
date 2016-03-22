@@ -11,7 +11,7 @@ libary for using the I2C mag3110 magnetometer
 */
 
 #include <Arduino.h>
-#include "mag3110.h"
+#include "MAG3110.h"
 #include <Wire.h>
 
 //Constructor
