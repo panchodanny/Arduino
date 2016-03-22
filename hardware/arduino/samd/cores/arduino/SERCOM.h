@@ -1,3 +1,21 @@
+/*
+  Copyright (c) 2014 Arduino.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
 #ifndef _SERCOM_CLASS_
 #define _SERCOM_CLASS_
 
@@ -61,15 +79,15 @@ typedef enum
 
 typedef enum
 {
-	UART_TX_PAD_0 = 0x0ul,	//Only for UART
-	UART_TX_PAD_2 = 0x1ul,  //Only for UART
+	UART_TX_PAD_0 = 0x0ul,	// Only for UART
+	UART_TX_PAD_2 = 0x1ul,  // Only for UART
+	UART_TX_RTS_CTS_PAD_0_2_3 = 0x2ul,  // Only for UART with TX on PAD0, RTS on PAD2 and CTS on PAD3
 } SercomUartTXPad;
 
 typedef enum
 {
-	SAMPLE_RATE_x16 = 0,	//Arithmetic
-	SAMPLE_RATE_x8 = 0x2,	//Arithmetic
-	SAMPLE_RATE_x3 = 0x3	//Arithmetic
+	SAMPLE_RATE_x16 = 0x1,	//Fractional
+	SAMPLE_RATE_x8 = 0x3,	//Fractional
 } SercomUartSampleRate;
 
 typedef enum
@@ -143,16 +161,20 @@ class SERCOM
 		bool isDataRegisterEmptyUART( void ) ;
 		uint8_t readDataUART( void ) ;
 		int writeDataUART(uint8_t data) ;
+		bool isUARTError() ;
+		void acknowledgeUARTError() ;
 
 		/* ========== SPI ========== */
 		void initSPI(SercomSpiTXPad mosi, SercomRXPad miso, SercomSpiCharSize charSize, SercomDataOrder dataOrder) ;
+                void initSPIslave(SercomSpiTXPad mosi, SercomRXPad miso, SercomSpiCharSize charSize, SercomDataOrder dataOrder);
 		void initSPIClock(SercomSpiClockMode clockMode, uint32_t baudrate) ;
 
 		void resetSPI( void ) ;
 		void enableSPI( void ) ;
 		void disableSPI( void ) ;
 		void setDataOrderSPI(SercomDataOrder dataOrder) ;
-		void setBaudrateSPI(uint8_t divider) ;
+		SercomDataOrder getDataOrderSPI( void ) ;
+		void setBaudrateSPI(uint16_t divider) ;
 		void setClockModeSPI(SercomSpiClockMode clockMode) ;
 		void writeDataSPI(uint8_t data) ;
 		uint16_t readDataSPI( void ) ;
@@ -167,22 +189,23 @@ class SERCOM
 
 		void resetWIRE( void ) ;
 		void enableWIRE( void ) ;
-        void disableWIRE( void );
-        void prepareNackBitWIRE( void ) ;
-        void prepareAckBitWIRE( void ) ;
-        void prepareCommandBitsWire(SercomMasterCommandWire cmd);
+    void disableWIRE( void );
+    void prepareNackBitWIRE( void ) ;
+    void prepareAckBitWIRE( void ) ;
+    void prepareCommandBitsWire(uint8_t cmd);
 		bool startTransmissionWIRE(uint8_t address, SercomWireReadWriteFlag flag) ;
 		bool sendDataMasterWIRE(uint8_t data) ;
 		bool sendDataSlaveWIRE(uint8_t data) ;
 		bool isMasterWIRE( void ) ;
 		bool isSlaveWIRE( void ) ;
 		bool isBusIdleWIRE( void ) ;
+		bool isBusOwnerWIRE( void ) ;
 		bool isDataReadyWIRE( void ) ;
 		bool isStopDetectedWIRE( void ) ;
 		bool isRestartDetectedWIRE( void ) ;
 		bool isAddressMatch( void ) ;
 		bool isMasterReadOperationWIRE( void ) ;
-        bool isRXNackReceivedWIRE( void ) ;
+    bool isRXNackReceivedWIRE( void ) ;
 		int availableWIRE( void ) ;
 		uint8_t readDataWIRE( void ) ;
 
