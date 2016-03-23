@@ -1,80 +1,74 @@
-#include "rest.h"
+#include "EnergySaving.h"
 
-
-
-void rest::begin(unsigned int mode, unsigned int inter_pin, voidFuncPtr callback)
+void EnergySaving::begin(unsigned int mode, unsigned int inter_pin, voidFuncPtr callback)
 {
 	if((mode == WAKE_EXT_INTERRUPT) && (inter_pin !=2) &&  (inter_pin!=0) && (inter_pin!=1))
 	{
 		 NVMCTRL->CTRLB.bit.SLEEPPRM = 3;
-		
+
 		SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 		pinMode(inter_pin,INPUT_PULLUP);
-		
-		attachInterrupt(inter_pin,callback,FALLING);
+
+		attachInterrupt(inter_pin,callback, CHANGE);
 		enable_eic_wake(inter_pin);
 		set_clk();
-		
+
 	}
-	else return; 
-	
-	
-	
-	
+	else return;
 }
 
 
-void rest::begin(unsigned int mode)
+void EnergySaving::begin(unsigned int mode)
 {
 	if(mode == WAKE_RTC_ALARM)
 	{
 		//RTCInt.begin(TIME_H24);
-		
-		GCLK->CLKCTRL.bit.CLKEN = 0; //disable GCLK module 
+
+		GCLK->CLKCTRL.bit.CLKEN = 0; //disable GCLK module
 		while (GCLK->STATUS.bit.SYNCBUSY);
-		
+
 		GCLK->GENCTRL.bit.RUNSTDBY = 1;  //GCLK6 run standby
 		while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-		
-		GCLK->CLKCTRL.bit.CLKEN = 1; //disable GCLK module 
+
+		GCLK->CLKCTRL.bit.CLKEN = 1; //disable GCLK module
 		while (GCLK->STATUS.bit.SYNCBUSY);
-		
+
 		NVMCTRL->CTRLB.bit.SLEEPPRM = 3;
-		
+
 		SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-		
+
 	}
-	else return; 
-	
+	else return;
+
 }
 
 
-void rest::standby(void)
+void EnergySaving::standby(void)
 {
 	__DSB();
     __WFI();
-	
+
 }
 
 
-void rest::set_clk(void)
+void EnergySaving::set_clk(void)
 {
-	GCLK->CLKCTRL.bit.CLKEN = 0; //disable GCLK module 
+	GCLK->CLKCTRL.bit.CLKEN = 0; //disable GCLK module
 		while (GCLK->STATUS.bit.SYNCBUSY);
-		
+
 		GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK6 | GCLK_CLKCTRL_ID( GCM_EIC )) ;  //EIC clock switched on GCLK6
 		while (GCLK->STATUS.bit.SYNCBUSY);
-		
+
 		GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K | GCLK_GENCTRL_ID(6));  //source for GCLK6 is OSCULP32K
 		while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-		
+
 		GCLK->GENCTRL.bit.RUNSTDBY = 1;  //GCLK6 run standby
 		while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-	
+
 }
 
 
-void rest::enable_eic_wake(unsigned int inter_pin)
+void EnergySaving::enable_eic_wake(unsigned int inter_pin)
 {
 	switch(inter_pin)
 		{
@@ -113,7 +107,5 @@ void rest::enable_eic_wake(unsigned int inter_pin)
 				break;
 			default:
 				break;
-				
-		}		
-	
+		}
 }
