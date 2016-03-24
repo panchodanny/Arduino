@@ -23,7 +23,7 @@ boolean REST::begin(const char* host, uint16_t port, boolean security)
   if(security)
     sec = 1;
   restCb.attach(this, &REST::restCallback);
-
+  
   uint16_t crc = esp->request(CMD_REST_SETUP, (uint32_t)&restCb, 1, 3);
   crc = esp->request(crc,(uint8_t*)host, strlen(host));
   crc = esp->request(crc,(uint8_t*)&port, 2);
@@ -57,7 +57,7 @@ void REST::request(const char* path, const char* method, const char* data, int l
     crc = esp->request(crc,(uint8_t*)&len, 2);
     crc = esp->request(crc,(uint8_t*)data, len);
   }
-
+    
   esp->request(crc);
 }
 void REST::request(const char* path, const char* method, const char* data)
@@ -132,7 +132,7 @@ uint16_t REST::getResponse(char* data, uint16_t maxLen)
     resp.popArgs((uint8_t*)data, maxLen);
     return esp->return_value;
   }
-
-
+    
+  
   return 0;
 }

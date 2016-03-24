@@ -26,23 +26,16 @@ Please keep the above information when you use this code in your project.
 
 #define WIRE Wire
 
-
-WifiData::WifiData(uint8_t prtcl, uint8_t addr_sspin)
+WifiData::WifiData()
 {
-    protocol = prtcl;
-    if ( protocol == SC16IS750_PROTOCOL_I2C ) {
-        device_address_sspin = (addr_sspin>>1);
-    } else {
-        device_address_sspin = addr_sspin;
-    }
+    device_address_sspin = (SC16IS750_ADDRESS_AA >> 1);
     peek_flag = 0;
 }
 
 void WifiData::begin(uint32_t baud)
 {
-    //Serial.println("1111111111111111");
+
     if ( protocol == SC16IS750_PROTOCOL_I2C) {
-    //Serial.println("22222222222222");
         WIRE.begin();
     } 
     ResetDevice();

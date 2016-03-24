@@ -91,8 +91,8 @@ public:
 class ESP
 {
 public:
-  ESP(Stream *serial, Stream* debug, int chip_pd);
-  ESP(Stream *serial, int chip_pd);
+  //ESP(Stream *serial, Stream* debug, int chip_pd);
+  ESP(Stream *serial); //ok
   Stream *_debug;
 
   FP<void, void*> wifiCb;

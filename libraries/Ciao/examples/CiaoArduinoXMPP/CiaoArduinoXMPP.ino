@@ -19,13 +19,11 @@
  
 #include <Ciao.h>
 
-String USER="andrea@xmpp01";
+String USER="user@domain";
 String mess[5]={"Hi, I am MCU :-P","hallo , ik ben MCU :-P","bonjour, je suis MCU :-P","Ciao, io sono MCU :-P","Kon'nichiwa, watashi wa MCU yo :-P" };
 
 void setup() {
-  Serial.begin(9600); 
-  Ciao.begin();
- 
+  Ciao.begin(); 
 }
 
 void loop() {
@@ -39,7 +37,7 @@ void loop() {
     
     message.toLowerCase();
     if(message == "ciao" )
-      Ciao.write("xmpp", USER,"ciao");
+      Ciao.write("xmpp", USER,mess[random(0,5)]);
   }
 }
 
