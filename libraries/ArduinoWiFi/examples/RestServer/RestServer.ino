@@ -1,5 +1,8 @@
 /*
-  Arduino Uno WiFi Ciao example
+ 
+ RestServer.ino
+ 
+ Arduino Uno WiFi Ciao example
 
  This example for the Arduino Uno WiFi shows how to use the
  Ciao library to access the digital and analog pins
@@ -18,11 +21,12 @@
 
  This example code is part of the public domain
 
- http://labs ... REST Server Arduino UNo WiFi
- */
+ http://labs.arduino.org/RestServer+and+RestClient
+
+*/
  
 #include <Wire.h>
-#include <ArduinoWifi.h>
+#include <ArduinoWiFi.h>
 
 
 void setup() {
@@ -81,6 +85,7 @@ void digitalCommand(WifiData client) {
   client.print(pin);
   client.print(F(" set to "));
   client.println(value);
+  client.print(EOL);    //char terminator
 
 }
 
@@ -103,6 +108,7 @@ void analogCommand(WifiData client) {
     client.print(pin);
     client.print(F(" set to analog "));
     client.println(value);
+    client.print(EOL);    //char terminator
 
   }
   else {
@@ -115,6 +121,7 @@ void analogCommand(WifiData client) {
     client.print(pin);
     client.print(F(" reads analog "));
     client.println(value);
+    client.print(EOL);    //char terminator
 
   }
 }
@@ -128,6 +135,7 @@ void modeCommand(WifiData client) {
   // If the next character is not a '/' we have a malformed URL
   if (client.read() != '/') {
     client.println(F("error"));
+    client.print(EOL);    //char terminator
     return;
   }
 
@@ -140,6 +148,7 @@ void modeCommand(WifiData client) {
     client.print(F("Pin D"));
     client.print(pin);
     client.println(F(" configured as INPUT!"));
+    client.print(EOL);    //char terminator
     return;
   }
 
@@ -150,11 +159,13 @@ void modeCommand(WifiData client) {
     client.print(F("Pin D"));
     client.print(pin);
     client.println(F(" configured as OUTPUT!"));
+    client.print(EOL);    //char terminator
     return;
   }
 
   client.print(F("error: invalid mode "));
   client.println(mode);
+  client.print(EOL);    //char terminator
 }
 
 

@@ -2,6 +2,9 @@
 #include <ArduinoWiFi.h>
 /*
 on your borwser, you type http://<IP>/arduino/webserver/ or http://<hostname>.local/arduino/webserver/
+
+http://labs.arduino.org/WebServer
+
 */
 void setup() {
     Wifi.begin();
@@ -43,5 +46,5 @@ void WebServer(WifiData client) {
             
           client.print("</body>"); 
           client.println("</html>"); 
-          client.print(END); // very important to end the communication !!!          
+          client.print(DELIMITER); // very important to end the communication !!!          
 }

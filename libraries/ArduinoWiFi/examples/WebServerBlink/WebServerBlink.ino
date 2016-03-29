@@ -2,8 +2,12 @@
 #include <ArduinoWiFi.h>
 /*
 on your borwser, you type http://<IP>/arduino/webserver/ or http://<hostname>.local/arduino/webserver/
+
+http://labs.arduino.org/WebServerBlink
+
 */
 void setup() {
+    pinMode(13,OUTPUT);
     Wifi.begin();
     Wifi.println("WebServer Server is up"); 
 }
@@ -44,7 +48,7 @@ void WebServer(WifiData client) {
           
           client.print("</body>");
           client.println("</html>");
-          client.print(END); // very important to end the communication !!! 
+          client.print(DELIMITER); // very important to end the communication !!! 
  
 }
 
@@ -67,6 +71,7 @@ void digitalCommand(WifiData client) {
   client.print(pin);
   client.print(F(" set to "));
   client.print(value);
+  client.print(EOL);    //char terminator
 
 }
 
