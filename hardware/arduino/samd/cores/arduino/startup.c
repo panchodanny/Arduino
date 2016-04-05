@@ -45,9 +45,9 @@ void NMI_Handler( void )
 
 void HardFault_Handler( void )
 {
-  while ( 1 )
+	 while ( 1 )
   {
-  }
+	 }
 }
 
 void SVC_Handler( void )
@@ -81,7 +81,7 @@ void RTC_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler
 void EIC_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 void NVMCTRL_Handler         ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 void DMAC_Handler            ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
-void USB_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
+void USB_Handler             ( void ) __attribute__ ((weak));
 void EVSYS_Handler           ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 void SERCOM0_Handler         ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 void SERCOM1_Handler         ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
@@ -405,5 +405,19 @@ void Dummy_Handler( void )
 {
   while ( 1 )
   {
-  }
+ }
 }
+
+static void (*usb_isr)(void) = NULL;
+
+void USB_Handler(void)
+{
+  if (usb_isr)
+    usb_isr();
+}
+
+void USB_SetHandler(void (*new_usb_isr)(void))
+{
+  usb_isr = new_usb_isr;
+}
+

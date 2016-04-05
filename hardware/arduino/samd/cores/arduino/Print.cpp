@@ -114,9 +114,12 @@ size_t Print::print(const Printable& x)
 
 size_t Print::println(void)
 {
-  size_t n = print('\r');
-  n += print('\n');
-  return n;
+	//change init
+  // size_t n = print('\r');
+  // n += print('\n');
+  // return n;
+   return write("\r\n");
+  //change end
 }
 
 size_t Print::println(const String &s)
