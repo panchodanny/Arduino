@@ -78,6 +78,7 @@ void loop() {
   Serial.println(lucky.accelerometer().z());
 
   //read magnetometer sensor
+  lucky.magnetometer().read();
   Serial.print("Mx: ");
   Serial.print(lucky.magnetometer().x());
   Serial.print("  My: ");

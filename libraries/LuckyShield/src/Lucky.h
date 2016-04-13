@@ -39,6 +39,10 @@
 #include <Arduino.h>
 #include "Wire.h"
 
+#ifdef __SAM3X8E__
+#define Wire Wire1
+#endif
+
 class Lucky
 {
 	public:

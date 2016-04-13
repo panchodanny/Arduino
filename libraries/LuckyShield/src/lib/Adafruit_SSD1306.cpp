@@ -31,6 +31,9 @@ All text above, and the splash screen below must be included in any redistributi
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
 
+#ifdef __SAM3X8E__
+#define Wire Wire1
+#endif
 // the memory buffer for the LCD
 
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8] = { 
