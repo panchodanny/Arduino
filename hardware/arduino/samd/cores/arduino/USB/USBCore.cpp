@@ -120,6 +120,7 @@ uint32_t USBD_Send(uint32_t ep, const void *data, uint32_t len)
 	if (len > 16384)
 		return -1;
 
+	PORT->Group[0].OUTCLR.reg =0x08000000 ; //TxLED on
 	// Flash area
 	while (len != 0)
 	{
@@ -133,7 +134,7 @@ uint32_t USBD_Send(uint32_t ep, const void *data, uint32_t len)
 		memcpy(&udd_ep_in_cache_buffer[ep], data, length);
 
 		usbd.epBank1SetAddress(ep, &udd_ep_in_cache_buffer[ep]);
-		//problems in swapping the below function!!!!
+
 		usbd.epBank1SetByteCount(ep, length);
 
 		// Clear the transfer complete flag
@@ -623,8 +624,10 @@ void ISRHandler()
 			// Remove stall request
 			usbd.epBank1DisableStalled(0);
 		}
-
+	
 	} // end Received Setup handler
+	PORT->Group[0].OUTSET.reg =0x08000000 ; //TxLED off
+	PORT->Group[1].OUTSET.reg =0x00000008 ; //RxLED off
 
 	uint8_t i=0;
 	uint8_t ept_int = usbd.epInterruptSummary() & 0xFE; // Remove endpoint number 0 (setup)
@@ -733,6 +736,7 @@ uint32_t USBD_Recv(uint32_t ep, void *_data, uint32_t len)
 	if (!_usbConfiguration)
 		return -1;
 
+	PORT->Group[1].OUTCLR.reg =0x00000008 ; //RxLED on
 	if (USBD_Available(ep) < len)
 		len = USBD_Available(ep);
 
