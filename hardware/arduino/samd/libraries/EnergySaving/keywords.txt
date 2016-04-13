@@ -1,12 +1,12 @@
 #######################################
-# Syntax Coloring Map For Rest
+# Syntax Coloring Map For Energy Saving
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-rest	KEYWORD1
+EnergySaving	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -22,6 +22,3 @@ standby	KEYWORD2
 #######################################
 WAKE_EXT_INTERRUPT	LITERAL1
 WAKE_RTC_ALARM	LITERAL1
-
-
-

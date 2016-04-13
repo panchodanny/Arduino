@@ -1,5 +1,5 @@
-#ifndef rest_h
-#define rest_h
+#ifndef energy_saving_h
+#define energy_saving_h
 
 
 #include <sam.h>
@@ -10,17 +10,17 @@
 
 typedef void (*voidFuncPtr)( void ) ;
 
-class rest {
+class EnergySaving {
 	public:
 		//sleep();
 		void begin(unsigned int mode, unsigned int inter_pin, voidFuncPtr callback);
 		void begin(unsigned int mode);
 		void standby(void);
-	
+
 	private:
 		void set_clk(void);
 		void enable_eic_wake(unsigned int inter_pin);
-		
+
 };
 
 #endif
