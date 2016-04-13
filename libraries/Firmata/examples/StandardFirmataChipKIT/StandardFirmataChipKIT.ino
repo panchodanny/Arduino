@@ -12,6 +12,7 @@
   Copyright (C) 2010-2011 Paul Stoffregen.  All rights reserved.
   Copyright (C) 2009 Shigeru Kobayashi.  All rights reserved.
   Copyright (C) 2009-2016 Jeff Hoefs.  All rights reserved.
+  Copyright (C) 2015 Brian Schmalz. All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -23,7 +24,7 @@
   Last updated by Jeff Hoefs: January 10th, 2016
 */
 
-#include <Servo.h>
+#include <SoftPWMServo.h>  // Gives us PWM and Servo on every pin
 #include <Wire.h>
 #include <Firmata.h>
 
@@ -46,10 +47,6 @@
 /*==============================================================================
  * GLOBAL VARIABLES
  *============================================================================*/
-
-#ifdef FIRMATA_SERIAL_FEATURE
-SerialFirmata serialFeature;
-#endif
 
 /* analog inputs */
 int analogInputsToReport = 0; // bitwise array to store pin reporting
@@ -83,14 +80,13 @@ signed char queryIndex = -1;
 // default delay time between i2c read request and Wire.requestFrom()
 unsigned int i2cReadDelayTime = 0;
 
-Servo servos[MAX_SERVOS];
+SoftServo servos[MAX_SERVOS];
 byte servoPinMap[TOTAL_PINS];
 byte detachedServos[MAX_SERVOS];
 byte detachedServoCount = 0;
 byte servoCount = 0;
 
 boolean isResetting = false;
-
 
 /* utility functions */
 void wireWrite(byte data)
@@ -228,36 +224,13 @@ void checkDigitalInputs(void)
 }
 
 // -----------------------------------------------------------------------------
-
-/* disable the i2c pins so they can be used for other functions */
-void disableI2CPins() {
-  isI2CEnabled = false;
-  // disable read continuous mode for all devices
-  queryIndex = -1;
-}
-
-/* sets bits in a bit array (int) to toggle the reporting of the analogIns
+/* Sets a pin that is in Servo mode to a particular output value
+ * (i.e. pulse width). Different boards may have different ways of
+ * setting servo values, so putting it in a function keeps things cleaner.
  */
-//void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
-//}
-void reportAnalogCallback(byte analogPin, int value)
+void servoWrite(byte pin, int value)
 {
-  if (analogPin < TOTAL_ANALOG_PINS) {
-    if (value == 0) {
-      analogInputsToReport = analogInputsToReport & ~ (1 << analogPin);
-    } else {
-      analogInputsToReport = analogInputsToReport | (1 << analogPin);
-      // prevent during system reset or all analog pin values will be reported
-      // which may report noise for unconnected analog pins
-      if (!isResetting) {
-        // Send pin value immediately. This is helpful when connected via
-        // ethernet, wi-fi or bluetooth so pin states can be known upon
-        // reconnecting.
-        Firmata.sendAnalog(analogPin, analogRead(analogPin));
-      }
-    }
-  }
-  // TODO: save status to EEPROM here, if changed
+  SoftPWMServoPWMWrite(PIN_TO_PWM(pin), value);
 }
 
 // -----------------------------------------------------------------------------
@@ -330,7 +303,7 @@ void setPinModeCallback(byte pin, int mode)
     case PIN_MODE_PWM:
       if (IS_PIN_PWM(pin)) {
         pinMode(PIN_TO_PWM(pin), OUTPUT);
-        analogWrite(PIN_TO_PWM(pin), 0);
+        servoWrite(PIN_TO_PWM(pin), 0);
         Firmata.setPinMode(pin, PIN_MODE_PWM);
       }
       break;
@@ -350,11 +323,6 @@ void setPinModeCallback(byte pin, int mode)
         // the user must call I2C_CONFIG to enable I2C for a device
         Firmata.setPinMode(pin, PIN_MODE_I2C);
       }
-      break;
-    case PIN_MODE_SERIAL:
-#ifdef FIRMATA_SERIAL_FEATURE
-      serialFeature.handlePinMode(pin, PIN_MODE_SERIAL);
-#endif
       break;
     default:
       Firmata.sendString("Unknown pin mode"); // TODO: put error msgs in EEPROM
@@ -389,7 +357,7 @@ void analogWriteCallback(byte pin, int value)
         break;
       case PIN_MODE_PWM:
         if (IS_PIN_PWM(pin))
-          analogWrite(PIN_TO_PWM(pin), value);
+          servoWrite(PIN_TO_PWM(pin), value);
         Firmata.setPinState(pin, value);
         break;
     }
@@ -432,6 +400,29 @@ void digitalWriteCallback(byte port, int value)
 
 
 // -----------------------------------------------------------------------------
+/* sets bits in a bit array (int) to toggle the reporting of the analogIns
+ */
+//void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
+//}
+void reportAnalogCallback(byte analogPin, int value)
+{
+  if (analogPin < TOTAL_ANALOG_PINS) {
+    if (value == 0) {
+      analogInputsToReport = analogInputsToReport & ~ (1 << analogPin);
+    } else {
+      analogInputsToReport = analogInputsToReport | (1 << analogPin);
+      // prevent during system reset or all analog pin values will be reported
+      // which may report noise for unconnected analog pins
+      if (!isResetting) {
+        // Send pin value immediately. This is helpful when connected via
+        // ethernet, wi-fi or bluetooth so pin states can be known upon
+        // reconnecting.
+        Firmata.sendAnalog(analogPin, analogRead(analogPin));
+      }
+    }
+  }
+  // TODO: save status to EEPROM here, if changed
+}
 
 void reportDigitalCallback(byte port, int value)
 {
@@ -448,25 +439,6 @@ void reportDigitalCallback(byte port, int value)
   // as analog when sampling the analog inputs.  Likewise, while
   // scanning digital pins, portConfigInputs will mask off values from any
   // pins configured as analog
-}
-
-// -----------------------------------------------------------------------------
-
-void enableI2CPins()
-{
-  byte i;
-  // is there a faster way to do this? would probaby require importing
-  // Arduino.h to get SCL and SDA pins
-  for (i = 0; i < TOTAL_PINS; i++) {
-    if (IS_PIN_I2C(i)) {
-      // mark pins as i2c so they are ignore in non i2c data requests
-      setPinModeCallback(i, PIN_MODE_I2C);
-    }
-  }
-
-  isI2CEnabled = true;
-
-  Wire.begin();
 }
 
 /*==============================================================================
@@ -654,9 +626,6 @@ void sysexCallback(byte command, byte argc, byte *argv)
           Firmata.write(PIN_MODE_I2C);
           Firmata.write(1);  // TODO: could assign a number to map to SCL or SDA
         }
-#ifdef FIRMATA_SERIAL_FEATURE
-        serialFeature.handleCapability(pin);
-#endif
         Firmata.write(127);
       }
       Firmata.write(END_SYSEX);
@@ -684,15 +653,32 @@ void sysexCallback(byte command, byte argc, byte *argv)
       }
       Firmata.write(END_SYSEX);
       break;
-
-    case SERIAL_MESSAGE:
-#ifdef FIRMATA_SERIAL_FEATURE
-      serialFeature.handleSysex(command, argc, argv);
-#endif
-      break;
   }
 }
 
+void enableI2CPins()
+{
+  byte i;
+  // is there a faster way to do this? would probaby require importing
+  // Arduino.h to get SCL and SDA pins
+  for (i = 0; i < TOTAL_PINS; i++) {
+    if (IS_PIN_I2C(i)) {
+      // mark pins as i2c so they are ignore in non i2c data requests
+      setPinModeCallback(i, PIN_MODE_I2C);
+    }
+  }
+
+  isI2CEnabled = true;
+
+  Wire.begin();
+}
+
+/* disable the i2c pins so they can be used for other functions */
+void disableI2CPins() {
+  isI2CEnabled = false;
+  // disable read continuous mode for all devices
+  queryIndex = -1;
+}
 
 /*==============================================================================
  * SETUP()
@@ -701,14 +687,8 @@ void sysexCallback(byte command, byte argc, byte *argv)
 void systemResetCallback()
 {
   isResetting = true;
-
   // initialize a defalt state
   // TODO: option to load config from EEPROM instead of default
-
-#ifdef FIRMATA_SERIAL_FEATURE
-  serialFeature.reset();
-#endif
-
   if (isI2CEnabled) {
     disableI2CPins();
   }
@@ -763,17 +743,13 @@ void setup()
   Firmata.attach(START_SYSEX, sysexCallback);
   Firmata.attach(SYSTEM_RESET, systemResetCallback);
 
-  // to use a port other than Serial, such as Serial1 on an Arduino Leonardo or Mega,
-  // Call begin(baud) on the alternate serial port and pass it to Firmata to begin like this:
-  // Serial1.begin(57600);
-  // Firmata.begin(Serial1);
-  // However do not do this if you are using SERIAL_MESSAGE
-
+  /* For chipKIT Pi board, we need to use Serial1. All others just use Serial. */
+#if defined(_BOARD_CHIPKIT_PI_)
+  Serial1.begin(57600);
+  Firmata.begin(Serial1);
+#else
   Firmata.begin(57600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for ATmega32u4-based boards and Arduino 101
-  }
-
+#endif
   systemResetCallback();  // reset to default config
 }
 
@@ -814,8 +790,4 @@ void loop()
       }
     }
   }
-
-#ifdef FIRMATA_SERIAL_FEATURE
-  serialFeature.update();
-#endif
 }

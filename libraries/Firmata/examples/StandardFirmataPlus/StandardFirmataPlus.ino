@@ -23,9 +23,29 @@
   Last updated by Jeff Hoefs: January 10th, 2016
 */
 
+/*
+  README
+
+  StandardFirmataPlus adds additional features that may exceed the Flash and
+  RAM sizes of Arduino boards such as ATMega328p (Uno) and ATMega32u4
+  (Leonardo, Micro, Yun, etc). It is best to use StandardFirmataPlus with higher
+  memory boards such as the Arduino Mega, Arduino Due, Teensy 3.0/3.1/3.2.
+
+  All Firmata examples that are appended with "Plus" add the following features:
+
+  - Ability to interface with serial devices using UART, USART, or SoftwareSerial
+    depending on the capatilities of the board.
+
+  At the time of this writing, StandardFirmataPlus will still compile and run
+  on ATMega328p and ATMega32u4-based boards, but future versions of this sketch
+  may not as new features are added.
+*/
+
 #include <Servo.h>
 #include <Wire.h>
 #include <Firmata.h>
+
+#include "utility/SerialFirmata.h"
 
 #define I2C_WRITE                   B00000000
 #define I2C_READ                    B00001000
@@ -228,39 +248,6 @@ void checkDigitalInputs(void)
 }
 
 // -----------------------------------------------------------------------------
-
-/* disable the i2c pins so they can be used for other functions */
-void disableI2CPins() {
-  isI2CEnabled = false;
-  // disable read continuous mode for all devices
-  queryIndex = -1;
-}
-
-/* sets bits in a bit array (int) to toggle the reporting of the analogIns
- */
-//void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
-//}
-void reportAnalogCallback(byte analogPin, int value)
-{
-  if (analogPin < TOTAL_ANALOG_PINS) {
-    if (value == 0) {
-      analogInputsToReport = analogInputsToReport & ~ (1 << analogPin);
-    } else {
-      analogInputsToReport = analogInputsToReport | (1 << analogPin);
-      // prevent during system reset or all analog pin values will be reported
-      // which may report noise for unconnected analog pins
-      if (!isResetting) {
-        // Send pin value immediately. This is helpful when connected via
-        // ethernet, wi-fi or bluetooth so pin states can be known upon
-        // reconnecting.
-        Firmata.sendAnalog(analogPin, analogRead(analogPin));
-      }
-    }
-  }
-  // TODO: save status to EEPROM here, if changed
-}
-
-// -----------------------------------------------------------------------------
 /* sets the pin mode to the correct state and sets the relevant bits in the
  * two bit-arrays that track Digital I/O and PWM status
  */
@@ -432,6 +419,29 @@ void digitalWriteCallback(byte port, int value)
 
 
 // -----------------------------------------------------------------------------
+/* sets bits in a bit array (int) to toggle the reporting of the analogIns
+ */
+//void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
+//}
+void reportAnalogCallback(byte analogPin, int value)
+{
+  if (analogPin < TOTAL_ANALOG_PINS) {
+    if (value == 0) {
+      analogInputsToReport = analogInputsToReport & ~ (1 << analogPin);
+    } else {
+      analogInputsToReport = analogInputsToReport | (1 << analogPin);
+      // prevent during system reset or all analog pin values will be reported
+      // which may report noise for unconnected analog pins
+      if (!isResetting) {
+        // Send pin value immediately. This is helpful when connected via
+        // ethernet, wi-fi or bluetooth so pin states can be known upon
+        // reconnecting.
+        Firmata.sendAnalog(analogPin, analogRead(analogPin));
+      }
+    }
+  }
+  // TODO: save status to EEPROM here, if changed
+}
 
 void reportDigitalCallback(byte port, int value)
 {
@@ -448,25 +458,6 @@ void reportDigitalCallback(byte port, int value)
   // as analog when sampling the analog inputs.  Likewise, while
   // scanning digital pins, portConfigInputs will mask off values from any
   // pins configured as analog
-}
-
-// -----------------------------------------------------------------------------
-
-void enableI2CPins()
-{
-  byte i;
-  // is there a faster way to do this? would probaby require importing
-  // Arduino.h to get SCL and SDA pins
-  for (i = 0; i < TOTAL_PINS; i++) {
-    if (IS_PIN_I2C(i)) {
-      // mark pins as i2c so they are ignore in non i2c data requests
-      setPinModeCallback(i, PIN_MODE_I2C);
-    }
-  }
-
-  isI2CEnabled = true;
-
-  Wire.begin();
 }
 
 /*==============================================================================
@@ -693,6 +684,29 @@ void sysexCallback(byte command, byte argc, byte *argv)
   }
 }
 
+void enableI2CPins()
+{
+  byte i;
+  // is there a faster way to do this? would probaby require importing
+  // Arduino.h to get SCL and SDA pins
+  for (i = 0; i < TOTAL_PINS; i++) {
+    if (IS_PIN_I2C(i)) {
+      // mark pins as i2c so they are ignore in non i2c data requests
+      setPinModeCallback(i, PIN_MODE_I2C);
+    }
+  }
+
+  isI2CEnabled = true;
+
+  Wire.begin();
+}
+
+/* disable the i2c pins so they can be used for other functions */
+void disableI2CPins() {
+  isI2CEnabled = false;
+  // disable read continuous mode for all devices
+  queryIndex = -1;
+}
 
 /*==============================================================================
  * SETUP()
@@ -762,6 +776,9 @@ void setup()
   Firmata.attach(SET_DIGITAL_PIN_VALUE, setPinValueCallback);
   Firmata.attach(START_SYSEX, sysexCallback);
   Firmata.attach(SYSTEM_RESET, systemResetCallback);
+
+  // Save a couple of seconds by disabling the startup blink sequence.
+  Firmata.disableBlinkVersion();
 
   // to use a port other than Serial, such as Serial1 on an Arduino Leonardo or Mega,
   // Call begin(baud) on the alternate serial port and pass it to Firmata to begin like this:
