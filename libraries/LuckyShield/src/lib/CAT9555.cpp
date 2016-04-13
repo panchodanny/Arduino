@@ -28,6 +28,10 @@
 #include "CAT9555.h"
 #include <Wire.h>
 
+#ifdef __SAM3X8E__
+#define Wire Wire1
+#endif
+
 // CONSTRUCTUR
 CAT9555::CAT9555(uint8_t addr)
 {
