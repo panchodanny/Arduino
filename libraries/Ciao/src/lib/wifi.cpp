@@ -2,7 +2,7 @@
 ****************************************************************************
 * Copyright (c) 2015 Arduino srl. All right reserved.
 *
-* File : UnowifiCiao.cpp
+* File : wifi.cpp
 * Date : 2016/02/16
 * Revision : 0.0.1 $
 * Author: adriano[at]arduino[dot]org
@@ -23,22 +23,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include "Ciao.h"
-#include "Wifi.h"
-
-#if defined(__AVR_ATmega328P__)
 
 #include <stdarg.h>
 #include <stdio.h>
 
-WifiData espSerial = WifiData(SC16IS750_PROTOCOL_I2C,SC16IS750_ADDRESS_AA);
-ESP esp(&espSerial, 4);
+#include "Ciao.h"
+#include "crc16.h"
+#include "rest.h"
+#include "espduino.h"
+#include "ringbuf.h"
+#include "FP.h"
+#include "string.h"
+
+#if defined(__AVR_ATmega328P__)
+
+WifiData espSerial;
+ESP esp(&espSerial);
 REST rest(&esp);
 
-CiaoClass Ciao;
-WifiClass Wifi;
-
 boolean wifiConnected = false;
+
+ArduinoWifiClass Wifi;
+CiaoClass Ciao;
 
 void wifiCb(void* response)
 {
@@ -57,43 +63,19 @@ void wifiCb(void* response)
 	}
 }
 
-void WifiClass::powerON(){ 	
-	
+void ArduinoWifiClass::powerON(){ 		
 }
-void WifiClass::powerOFF(){ 	
-	
+void ArduinoWifiClass::powerOFF(){ 		
 }
 
-WifiData WifiClass::stream(){
-	return espSerial;
-}
-int WifiClass::read(){
-	return espSerial.read();
-}
-void WifiClass::print(String str){
-	espSerial.print(str);
-}
-void WifiClass::println(String str){
-	espSerial.println(str);
-}
-void CiaoClass::print(String str){
-	espSerial.print(str);
-}
-void CiaoClass::println(String str){
-	espSerial.println(str);
-}
-boolean WifiClass::available(){
-	return espSerial.available();
-}
-void WifiClass::connect(char* ssid,char* pwd){
+void ArduinoWifiClass::connect(char* ssid,char* pwd){
 	esp.wifiConnect(ssid, pwd);
 }
-boolean WifiClass::connected(){
+boolean ArduinoWifiClass::connected(){
 	return wifiConnected;
 }
 
-void WifiBegin() {
-	Serial.begin(9600);
+void WifiBegin(short isCiao) {
 	espSerial.begin(9600);
 	if(espSerial.ping()!=1) {
 		espSerial.println("DBG: esp not found");
@@ -102,27 +84,30 @@ void WifiBegin() {
 	else {
 		//espSerial.println("device found");
 	}
-	//metti GPIO control here !!!
+	//put GPIO control here !!!
 	esp.enable();
 	delay(1000);
 	esp.reset();
 	delay(1000);
 	while(!esp.ready());
-	esp.wifiCb.attach(&wifiCb);
+	if (isCiao == 0)
+		esp.wifiCb.attach(&wifiCb);
+
 	espSerial.println("\nDBG: UnoWiFi Start");
 }
-void WifiClass::begin() {
-	WifiBegin();
+void ArduinoWifiClass::begin() {
+	WifiBegin(0);	
 }
-void CiaoClass::begin() {
 
-	WifiBegin();
-	espSerial.println("DBG: Ciao start");
+// -----------CIAO---------------------
+
+void CiaoClass::begin() {
+	
+        WifiBegin(1);
 	rest.begin("google.com");
 	rest.get("/");
 	delay(3000);
 }
-
 CiaoData responseREAD(){
 	CiaoData data;
 	delay(400);

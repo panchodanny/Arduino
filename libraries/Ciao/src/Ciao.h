@@ -29,13 +29,10 @@
 #define CIAO_H_
 
 #include <Arduino.h>
+#include <Stream.h>
 #include "lib/CiaoData.h"
 #if defined(__AVR_ATmega328P__)
-#include "lib/rest.h"
 #include "lib/SC16IS750.h"
-#include "lib/espduino.h"
-#else
-#include <Stream.h>
 #endif
 
 #if defined(__AVR_ATmega32U4__) || defined(ARDUINO_ARCH_SAMD)
@@ -43,7 +40,7 @@
 #if defined(__AVR_ATmega32U4__)
 #define BAUDRATE 250000
 #elif defined(ARDUINO_ARCH_SAMD)
-#define BAUDRATE 115200
+#define BAUDRATE 4000000
 #endif
 
 class CiaoClass {
@@ -54,20 +51,12 @@ class CiaoClass {
 		CiaoData writeResponse( String protocol, String id, String param1="", String param2 = "", String param3 = "");
 		CiaoData parse( String, String);
 		void println(String log){};
-		#if defined(__AVR_ATmega32U4__) 
 		CiaoClass(Stream &_stream);
-		#elif defined(ARDUINO_ARCH_SAMD)
-		CiaoClass(Serial_ stream);
-		#endif
 
 	private:
 		void dropAll();
 		bool started;
-		#if defined(__AVR_ATmega32U4__)
 		Stream &stream;
-		#elif defined(ARDUINO_ARCH_SAMD)
-		Serial_ stream;
-		#endif
 };
 
 // This subclass uses a serial port Stream
@@ -79,9 +68,9 @@ class SerialCiaoClass : public CiaoClass {
 			// Empty
 		}
 		#elif defined(ARDUINO_ARCH_SAMD)
-		SerialCiaoClass(Serial_ serial)
-			: CiaoClass(serial){
-			// Empty	
+		SerialCiaoClass(Serial_ &_serial)
+			: CiaoClass(_serial), serial(_serial) {
+			// Empty
 		}
 		#endif
 		void begin( unsigned long baudrate = BAUDRATE) {
@@ -92,7 +81,7 @@ class SerialCiaoClass : public CiaoClass {
 		#if defined(__AVR_ATmega32U4__)
 		HardwareSerial &serial;
 		#elif defined(ARDUINO_ARCH_SAMD)
-		Serial_ serial;
+		Serial_ &serial;
 		#endif
 };
 
@@ -102,19 +91,23 @@ extern SerialCiaoClass Ciao;
 
 #else
 
-// class CiaoData {
-// 	public:
-		
-// 		char* get(int index){
-// 			return msg_split[index];
-// 		}
-  
-// 	public:
-// 		char* msg_split[3];
-		
-// };
+class ArduinoWifiClass : public WifiData
+{
 
-class CiaoClass {
+	public:
+		void begin();		
+
+		boolean connected();
+		void connect(char* , char*);
+
+		void powerON();
+		void powerOFF();
+
+
+};
+
+class CiaoClass : public WifiData
+{
 	public:
 		void begin();
 
@@ -123,12 +116,12 @@ class CiaoClass {
 
 		CiaoData write( char*, char*, String );            // “rest”, ”hostname”, ”Stringone”,		
 		CiaoData write( char*, char*, String, char*);      // “rest”, ”hostname”, ”Stringone”, ”method”
-		
-		void print(String str);
-		void println(String str);
 	
 };
+
+
 extern CiaoClass Ciao;
+extern ArduinoWifiClass Wifi;
 
 #endif
 
