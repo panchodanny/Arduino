@@ -66,12 +66,11 @@ void digitalCommand(WifiData client) {
   }
   
   // Send feedback to client
-  client.println("Status: 200 OK\n");
   client.print(F("Pin D"));
   client.print(pin);
   client.print(F(" set to "));
   client.print(value);
-  client.print(EOL);    //char terminator
+  client.print(EOL);
 
 }
 
