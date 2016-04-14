@@ -15,8 +15,8 @@
 #include "wiring_constants.h"
 #include <Arduino.h>
  
-#define LSBFIRST 0
-#define MSBFIRST 1 
+//#define LSBFIRST 0 //already defined in wiring_constants.h
+//#define MSBFIRST 1 
 
 #define SPI_MODE0 0x02
 #define SPI_MODE1 0x00
