@@ -34,7 +34,7 @@ void analogReadResolution(int res) {
 	_readResolution = res;
 	while( ADC->STATUS.bit.SYNCBUSY == 1 )
   {
-    // Waiting for synchroinization
+    // Waiting for synchronization
   }
 	if(res == 8) ADC->CTRLB.bit.RESSEL= ADC_CTRLB_RESSEL_8BIT_Val; 
 	else if(res == 10) ADC->CTRLB.bit.RESSEL= ADC_CTRLB_RESSEL_10BIT_Val;   
@@ -61,7 +61,7 @@ void analogReference( eAnalogReference ulMode )
    ADC->CTRLA.bit.ENABLE = 0; // Enable ADC
   while( ADC->STATUS.bit.SYNCBUSY == 1 )
   {
-    // Waiting for synchroinization
+    // Waiting for synchronization
   }
   switch(ulMode)
   {
@@ -83,7 +83,7 @@ void analogReference( eAnalogReference ulMode )
   }ADC->CTRLA.bit.ENABLE = 1; // Enable ADC
   while( ADC->STATUS.bit.SYNCBUSY == 1 )
   {
-    // Waiting for synchroinization
+    // Waiting for synchronization
   }
 }
 
@@ -146,7 +146,7 @@ void analogWrite( uint32_t ulPin, uint32_t ulValue )
       	ulValue = mapResolution(ulValue, _writeResolution, DAC_RESOLUTION);
     	DAC->DATA.reg = ulValue & 0x3FF;  // Dac on 10 bits.
 		DAC->CTRLA.bit.ENABLE = 1; // DAC Enabled
-		syncDAC();
+		while (DAC->STATUS.bit.SYNCBUSY == 1); //wait for synchronization
       	return;
     }
 	

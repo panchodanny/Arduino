@@ -1,3 +1,23 @@
+ARDUINO 1.7.10 - 2016.04.15
+
+[ide]
+* New Board Arduino UNO-WiFi
+* New Board Arduino Tian
+
+[core]
+* Fixed SAMD serial communication over native port
+* Fixed SAMD concat. between string and float
+* Fixed SAMD analogWrite function
+
+[libraries]
+* Arduino Ciao Library Update 0.0.3
+* Arduino Lucky Shield Library Update to 1.0.3
+* 'Rest' renamed in 'EnergySaving'
+* new Arduino WiFi Library
+* 'WiFi' renamed in 'WiFi Shield'
+* Updated Firmata library and added SAMD compatibility
+* Fixed SAMD Servo, SD and SPI
+
 ARDUINO 1.7.9 - 2016.03.21
 
 [core]

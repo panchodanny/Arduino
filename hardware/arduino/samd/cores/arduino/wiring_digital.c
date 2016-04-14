@@ -177,6 +177,7 @@ void digitalWrite( uint32_t ulPin, uint32_t ulVal )
     break ;
 
     default:
+	  PORT->Group[g_APinDescription[ulPin].ulPort].OUTSET.reg = (1ul << g_APinDescription[ulPin].ulPin) ;
     break ;
   }
 

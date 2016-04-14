@@ -103,12 +103,13 @@ Please keep the above information when you use this code in your project.
 //#define     SC16IS750_DEBUG_PRINT   (0)
 #define     SC16IS750_PROTOCOL_I2C  (0)
 #define     SC16IS750_PROTOCOL_I2C  (0)
-#define     END     "<!--~-->"
+#define     DELIMITER     "<!--~-->"
+#define     EOL           '\0'
 
 class WifiData : public Stream
 { 
     public:
-        WifiData(uint8_t prtcl = SC16IS750_PROTOCOL_I2C, uint8_t addr = SC16IS750_ADDRESS_AD);
+	WifiData();
         void begin(uint32_t baud);                               
         int read();
         size_t write(uint8_t val);

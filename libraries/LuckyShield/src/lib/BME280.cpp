@@ -18,6 +18,9 @@
 #include <Wire.h>
 #include "BME280.h"
 
+#ifdef __SAM3X8E__
+#define Wire Wire1
+#endif
 
 /***************************************************************************
  PRIVATE FUNCTIONS

@@ -187,20 +187,14 @@ void ESP::init()
 
 }
 
-ESP::ESP(Stream *serial, int chip_pd):
-_serial(serial), _chip_pd(chip_pd)
+ESP::ESP(Stream *serial):
+_serial(serial)
 {
   _debugEn = false;
   init();
 }
 
-ESP::ESP(Stream *serial, Stream* debug, int chip_pd):
-_serial(serial), _debug(debug), _chip_pd(chip_pd)
-{
-    _debugEn = true;
-    //_serial = _debug;
-    init();
-}
+
 void ESP::enable()
 {
   digitalWrite(_chip_pd, HIGH);
