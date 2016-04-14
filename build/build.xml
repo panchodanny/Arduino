@@ -330,6 +330,11 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
 
+    <!-- Unzip AVRDUDE wrapper -->
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/avr/bin">
+      <fileset file="macosx/dist/avrdude" />
+    </copy>
+
     <copy todir="macosx/work/${staging_hardware_folder}/tools/">
       <fileset file="macosx/dist/bossac" />
     </copy>
@@ -371,6 +376,11 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
     </chmod>
 
+    <!-- macosx gatekeeper workaround. See https://github.com/arduino/Arduino/issues/3468 -->
+    <chmod perm="-x">
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/avrdude_bin" />
+    </chmod>
+
     <!-- Unzip OpenOCD tools -->
     <antcall target="untar">
       <param name="archive_file" value="${staging_folder}/dist/OpenOCD-0.9.0-arduino.org-x86_64-apple-darwin13.4.0.tar.bz2" />
@@ -378,8 +388,17 @@
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
-    <!--<chmod perm="755" file="macosx/work/${staging_hardware_folder}/tools/OpenOCD/openocd" />
--->
+
+    <!-- Unzip OPENOCD wrapper -->
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino/bin">
+      <fileset file="macosx/dist/openocd" />
+    </copy>
+
+    <!-- macosx gatekeeper workaround for openocd. See https://github.com/arduino/Arduino/issues/3468 -->
+    <chmod perm="-x">
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/openocd.bin" />
+    </chmod>
+
     <!-- Unzip CMSIS -->
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/dist/CMSIS.zip" />
@@ -387,6 +406,22 @@
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/CMSIS" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/CMSIS" />
     </antcall>
+
+    <!-- Unzip Esp-Link-Tools -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+    <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/avrflash" />
+    <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/wiflash" />
+
+
+    <copy todir="macosx/work/${staging_hardware_folder}/tools">
+      <fileset dir="macosx/dist" includes="drivers/**" />
+    </copy>
+
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
@@ -625,6 +660,16 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/CMSIS" />
     </antcall>
 
+    <!-- Unzip Esp-Link-Tools -->
+    <antcall target="untar">
+        <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+        <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-unix.tar.bz2" />
+        <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
+        <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+    <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/avrflash" />
+    <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools/wiflash" />
+
   </target>
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
@@ -821,11 +866,11 @@
   </target>
 
   <target name="download-launch4j-linux">
-    <get src="http://download.sourceforge.net/project/launch4j/launch4j-3/3.8/launch4j-3.8-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <get src="http://download.sourceforge.net/project/launch4j/launch4j-3/3.8/launch4j-3.8-macosx-x86-10.8.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
 
     <exec executable="tar" dir="windows/launcher">
       <arg value="-xf"/>
-      <arg value="../launch4j-3.8-linux.tgz"/>
+      <arg value="../launch4j-3.8-macosx-x86-10.8.tgz"/>
     </exec>
   </target>
 
@@ -866,8 +911,8 @@
 
     <!-- Unzip OpenOCD tools -->
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/OpenOCD-0.9.0-arduino.org-win32.tar.bz2" />
-      <param name="archive_url" value="http://download.arduino.org/tools/OpenOCD-0.9.0-arduino.org-win32.tar.bz2" />
+      <param name="archive_file" value="${staging_folder}/dist/OpenOCD-0.9.0-arduino.org-win32-fix.tar.bz2" />
+      <param name="archive_url" value="http://download.arduino.org/tools/OpenOCD-0.9.0-arduino.org-win32-fix.tar.bz2" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
@@ -936,6 +981,21 @@
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="windows/work/hardware/tools/avr/doc" />
     </delete>
+
+    <!-- Unzip AVR-FLASH ESP-LINK -->
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/esp-link-tools-1.0.1-arduino-win32.tar.bz2" />
+      <param name="archive_url" value="http://download.arduino.org/tools/esp-link-tools-1.0.1-arduino-win32.tar.bz2" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp-link-tools" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+
+    <!-- setting permissions to esp-link-tools -->
+    <chmod perm="755">
+      <fileset dir="windows/work/hardware/tools/esp-link-tools" includes="**/*.cmd, **/*.*" />
+      <fileset dir="windows/work/hardware/tools/esp-link-tools/bin" includes="**/*.exe" />
+    </chmod>
+
   </target>
 
   <target name="windows-run" depends="windows-build"

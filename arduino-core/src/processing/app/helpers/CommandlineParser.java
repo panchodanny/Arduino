@@ -32,12 +32,12 @@ public class CommandlineParser {
   public static CommandlineParser newCommandlineParser(String[] args) {
     return new CommandlineParser(args);
   }
-  
+
   private CommandlineParser(String[] args) {
     parseArguments(args);
     checkAction();
   }
-  
+
   private void parseArguments(String[] args) {
     // Map of possible actions and corresponding options
     final Map<String, ACTION> actions = new HashMap<String, ACTION>();
@@ -164,7 +164,7 @@ public class CommandlineParser {
       filenames.add(args[i]);
     }
   }
-  
+
   private void checkAction() {
     if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
       BaseNoGui.showError(null, _("Must specify exactly one sketch file"), 3);
@@ -226,7 +226,7 @@ public class CommandlineParser {
 
   private void processPrefArgument(String arg) {
     String[] split = arg.split("=", 2);
-    if (split.length != 2 || split[0].isEmpty())
+    if (split.length != 2 || split[0].isEmpty() || split[1].isEmpty())
       BaseNoGui.showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), 3);
 
     PreferencesData.set(split[0], split[1]);
@@ -251,27 +251,27 @@ public class CommandlineParser {
   public List<String> getFilenames() {
     return filenames;
   }
-  
+
   public boolean isGetPrefMode() {
     return action == ACTION.GET_PREF;
   }
-  
+
   public boolean isGuiMode() {
     return action == ACTION.GUI;
   }
-  
+
   public boolean isNoOpMode() {
     return action == ACTION.NOOP;
   }
-  
+
   public boolean isUploadMode() {
     return action == ACTION.UPLOAD;
   }
-  
+
   public boolean isVerifyMode() {
     return action == ACTION.VERIFY;
   }
-  
+
   public boolean isVerifyOrUploadMode() {
     return isVerifyMode() || isUploadMode();
   }

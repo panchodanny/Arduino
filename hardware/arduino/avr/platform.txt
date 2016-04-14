@@ -9,7 +9,7 @@ name=Arduino AVR Boards
 version=1.7.0
 
 # AVR compile variables
-# --------------------- 
+# ---------------------
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
 compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
@@ -72,6 +72,34 @@ recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 
 
+# ESP OTA Uploaders tools
+# ------------------------------
+
+#Upload sketch to mcu via ota
+
+tools.mcuota.path={runtime.ide.path}/hardware/tools/esp-link-tools
+tools.mcuota.cmd=avrflash
+tools.mcuota.cmd.windows=avrflash.cmd
+
+tools.mcuota.upload.params.verbose=-v
+tools.mcuota.upload.params.quiet=
+tools.mcuota.upload.pattern="{path}/{cmd}" {upload.verbose} {board.ipaddress} "{build.path}/{build.project_name}.hex"
+
+#Upload firmware to esp8266 via ota
+
+tools.espota.path={runtime.ide.path}/hardware/tools/esp-link-tools
+
+tools.espota.cmd=wiflash
+tools.espota.cmd.windows=wiflash.cmd
+
+tools.espota.erase.params.verbose=-v
+tools.espota.erase.params.quiet=
+tools.espota.erase.pattern=""
+
+tools.espota.bootloader.params.verbose=-v
+tools.espota.bootloader.params.quiet=
+tools.espota.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} {serial.port} "{runtime.platform.path}/firmwares/{bootloader.esp.file1}" "{runtime.platform.path}/firmwares/{bootloader.esp.file2}"
+
 # AVR Uploader/Programmers tools
 # ------------------------------
 
@@ -81,6 +109,7 @@ tools.avrdude.config.path={runtime.ide.path}/hardware/tools/avr/etc/avrdude.conf
 tools.avrdude.upload.params.verbose=-v
 tools.avrdude.upload.params.quiet=-q -q
 tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+#tools.avrdude.upload.wifi.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -Pnet:{board.ipaddress}:{upload.wifi.port}  -D -V -F "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 tools.avrdude.program.params.verbose=-v
 tools.avrdude.program.params.quiet=-q -q

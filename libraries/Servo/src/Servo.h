@@ -65,8 +65,10 @@
 	#include "sam/ServoTimers.h"
 #elif defined(ARDUINO_ARCH_SAMD)
 	//#include "samd/ServoTimersSamd.h"
-	#define MIN_PULSE_WIDTH_SAMD 500
-	#define MAX_PULSE_WIDTH_SAMD 2100
+	#define MIN_PULSE_WIDTH_SAMD_TCC 405
+	#define MAX_PULSE_WIDTH_SAMD_TCC 2300
+	#define MIN_PULSE_WIDTH_SAMD_TC 1700
+	#define MAX_PULSE_WIDTH_SAMD_TC 9200
 #else	
 	#error "This library only supports boards with an AVR,SAM or SAMD processor."
 #endif

@@ -20,7 +20,6 @@
 #include "USBCore.h"
 #include "USBDesc.h"
 #include "sam.h"
-#include "USB/USB_device.h"
 
 
 #ifdef HID_ENABLED
@@ -44,7 +43,7 @@ Keyboard_ Keyboard;
 
 //	HID report descriptor
 _Pragma("pack(1)")
-extern const uint8_t _hidReportDescriptor[] = {
+extern const uint32_t _hidReportDescriptor[] = {
 	//	Mouse
     0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)	// 54
     0x09, 0x02,                    //   USAGE (Mouse)
@@ -161,7 +160,7 @@ uint32_t HID_SizeReportDescriptor(void)
 
 uint32_t WEAK HID_GetDescriptor(void)
 {
-	return USBD_SendControl(0,_hidReportDescriptor,sizeof(_hidReportDescriptor));
+	return USBD_SendControl(_hidReportDescriptor,sizeof(_hidReportDescriptor));
 }
 
 void WEAK HID_SendReport(uint8_t id, const void* data, uint32_t len)
@@ -196,8 +195,8 @@ bool WEAK HID_Setup(Setup& setup)
 		}
 		if (HID_GET_IDLE == r)
 		{
-			UDD_Send(0, &_hid_idle, 1);
-			UDD_ClearIN();
+			USBD_Send(0, &_hid_idle, 1);
+			USB->DEVICE.DeviceEndpoint[EP0].EPSTATUSSET.reg = USB_DEVICE_EPSTATUSSET_BK1RDY;
 			return true;
 		}
 	}

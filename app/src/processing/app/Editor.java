@@ -58,6 +58,11 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.uploaders.SerialUploader;
 
+import processing.app.PreferencesData;
+import processing.app.debug.TargetPlatform;
+import processing.app.helpers.PreferencesMap;
+
+
 /**
  * Main editor panel for the Processing Development Environment.
  */
@@ -749,6 +754,36 @@ public class Editor extends JFrame implements RunnerListener {
       }
     });
 
+
+    if (OSUtils.isMacOS()) {
+      menu.addSeparator();
+      item = new JMenuItem(_("Install Driver"));
+      item.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            try{
+              TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
+              PreferencesMap prefs = PreferencesData.getMap();
+              PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+              if(boardPreferences.get("drivers") != null && !boardPreferences.get("drivers").trim().isEmpty()){
+                File driverFile = new File(prefs.get("runtime.ide.path") + "/hardware/tools/drivers/", boardPreferences.get("drivers"));
+                if(driverFile.exists()){
+                  Platform os = BaseNoGui.getPlatform();
+                  os.openFolder(driverFile);
+                }
+                else{
+                  Base.showWarning( _("File not found"), _("No driver file found."), null);
+                }
+              }
+              else{
+                Base.showMessage( _("Driver not need"), _("No driver needed for the selected board."));
+              }
+            }
+            catch(Exception ex) {
+            }
+          }
+        });
+      menu.add(item);
+    }
     return menu;
   }
 
@@ -1164,7 +1199,6 @@ public class Editor extends JFrame implements RunnerListener {
         });
       menu.add(item);
     }
-
     return menu;
   }
 
@@ -2558,6 +2592,11 @@ public class Editor extends JFrame implements RunnerListener {
     serialMonitor = new MonitorFactory().newMonitor(port);
     serialMonitor.setIconImage(getIconImage());
 
+    if(serialMonitor instanceof processing.app.EspLinkMonitor){//TEMPORARY
+        return;
+    }
+
+
     boolean success = false;
     do {
       if (serialMonitor.requiresAuthorization() && !Preferences.has(serialMonitor.getAuthorizationKey())) {
@@ -2603,6 +2642,35 @@ public class Editor extends JFrame implements RunnerListener {
   protected void handleBurnBootloader() {
     console.clear();
     statusNotice(_("Burning bootloader to I/O Board (this may take a minute)..."));
+
+    //Non-Blocking UI
+    /*
+    new Thread(
+      new Runnable() {
+        public void run() {
+          try {
+            Uploader uploader = new SerialUploader();
+            if (uploader.burnBootloader()) {
+              statusNotice(_("Done burning bootloader."));
+            } else {
+              statusError(_("Error while burning bootloader."));
+              // error message will already be visible
+            }
+          } catch (PreferencesMapException e) {
+            statusError(I18n.format(
+                        _("Error while burning bootloader: missing '{0}' configuration parameter"),
+                        e.getMessage()));
+          } catch (RunnerException e) {
+            statusError(e.getMessage());
+          } catch (Exception e) {
+            statusError(_("Error while burning bootloader."));
+            e.printStackTrace();
+          }
+        }
+    } ).start();
+    */
+
+    //Blocking UI
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {

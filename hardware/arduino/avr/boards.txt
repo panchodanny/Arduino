@@ -156,6 +156,42 @@ one.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
+unowifi.name=Arduino Uno WiFi
+unowifi.vid.0=0x2A03
+unowifi.pid.0=0x0057
+
+## ---- UNO WIFI - OTA ----
+
+unowifi.upload.via_ota=true
+unowifi.upload.via_ota.tool=mcuota
+
+## ---- UNO WIFI - USB ----
+
+unowifi.upload.tool=avrdude
+unowifi.upload.protocol=arduino
+unowifi.upload.maximum_size=32256
+unowifi.upload.maximum_data_size=2048
+unowifi.upload.speed=115200
+
+unowifi.bootloader.tool=avrdude
+unowifi.bootloader.low_fuses=0xFF
+unowifi.bootloader.high_fuses=0xDE
+unowifi.bootloader.extended_fuses=0x05
+unowifi.bootloader.unlock_bits=0x3F
+unowifi.bootloader.lock_bits=0x0F
+unowifi.bootloader.file=optiboot/optiboot_atmega328.hex
+
+unowifi.bootloader.esp.file1=esp8266/unowifi/firmware_arduino_esp8266_2016_03_18_file1.bin
+unowifi.bootloader.esp.file2=esp8266/unowifi/firmware_arduino_esp8266_2016_03_18_file2.bin
+
+unowifi.build.mcu=atmega328p
+unowifi.build.f_cpu=16000000L
+unowifi.build.board=AVR_UNO_WIFI
+unowifi.build.core=arduino
+unowifi.build.variant=standard
+
+##############################################################
+
 uno.name=Arduino Uno
 
 uno.vid.0=0x2341

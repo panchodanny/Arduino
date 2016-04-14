@@ -24,16 +24,25 @@ libary for using the I2C mag3110 magnetometer
 class MAG3110
 {
   public:
-    MAG3110();
+    //constructor
+    //MAG3110();
+    
+    //public methods
     void begin();
-    int readx();
-    int ready();
-    int readz();
-	
-	int x(){return readx();};
-	int y(){return ready();};
-	int z(){return readz();};
+    void read(); 
+    int x(){return mag_x;};
+    int y(){return mag_y;};
+    int z(){return mag_z;};
+
   private:
+    //class-only methods:
+    int read16Data(byte MSB, byte LSB);
+    
+    //global variables
+    int mag_x;
+    int mag_y;
+    int mag_z;
+    
 };
 
 extern MAG3110 mag3110;

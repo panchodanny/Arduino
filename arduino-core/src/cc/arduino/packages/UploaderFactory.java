@@ -31,6 +31,7 @@ package cc.arduino.packages;
 
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
+import cc.arduino.packages.uploaders.OTAUploader;
 import processing.app.debug.TargetBoard;
 
 public class UploaderFactory {
@@ -41,6 +42,10 @@ public class UploaderFactory {
 
     if ("true".equals(board.getPreferences().get("upload.via_ssh")) && port != null && "network".equals(port.getProtocol())) {
       return new SSHUploader(port);
+    }
+
+     if ("true".equals(board.getPreferences().get("upload.via_ota")) && port != null && "network".equals(port.getProtocol())) {
+      return new OTAUploader(port);
     }
 
     return new SerialUploader();

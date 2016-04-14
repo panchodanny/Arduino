@@ -147,6 +147,19 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
         board = info.getPropertyString("board");
         prefs.put("board", board);
         prefs.put("distro_version", info.getPropertyString("distro_version"));
+
+        if( info.getPropertyString("auth_upload")!= null ){
+          prefs.put("auth_upload", info.getPropertyString("auth_upload"));
+        }
+        if( info.getPropertyString("ssh_upload")!= null ){
+          prefs.put("ssh_upload", info.getPropertyString("ssh_upload"));
+        }
+        if( info.getPropertyString("tcp_check")!= null ){
+          prefs.put("tcp_check", info.getPropertyString("tcp_check"));
+        }
+        if( info.getPropertyString("distro_name")!= null ){
+          prefs.put("distro_name", info.getPropertyString("distro_name"));
+        }
       }
 
       prefs.put("port", "" + info.getPort());

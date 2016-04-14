@@ -30,6 +30,10 @@
 #include "MMA8491Q.h"
 #include <Wire.h>
 
+#ifdef __SAM3X8E__
+#define Wire Wire1
+#endif
+
 // CONSTRUCTUR
 MMA8491Q::MMA8491Q(uint8_t addr)
 {

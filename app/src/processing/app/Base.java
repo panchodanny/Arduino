@@ -85,7 +85,7 @@ public class Base {
 
   static public void main(String args[]) throws Exception {
     BaseNoGui.initLogger();
-    
+
     BaseNoGui.notifier = new GUIUserNotifier();
 
     initPlatform();
@@ -93,7 +93,7 @@ public class Base {
     BaseNoGui.initPortableFolder();
 
     BaseNoGui.initParameters(args);
-    
+
     BaseNoGui.initVersion();
 
 //    if (System.getProperty("mrj.version") != null) {
@@ -217,7 +217,7 @@ public class Base {
     }
 
     BaseNoGui.initPackages();
-    
+
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
@@ -318,7 +318,7 @@ public class Base {
    * sketch that was used (if any), and restores other Editor settings.
    * The complement to "storePreferences", this is called when the
    * application is first launched.
-   * @throws Exception 
+   * @throws Exception
    */
   protected boolean restoreSketches() throws Exception {
     // figure out window placement
@@ -582,7 +582,7 @@ public class Base {
 
   /**
    * Create a new untitled document in a new sketch window.
-   * @throws Exception 
+   * @throws Exception
    */
   public void handleNew() throws Exception {
     try {
@@ -652,7 +652,7 @@ public class Base {
 
   /**
    * Prompt for a sketch to open, and open it in a new window.
-   * @throws Exception 
+   * @throws Exception
    */
   public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
@@ -691,7 +691,7 @@ public class Base {
    * @param file File to open
    * @return the Editor object, so that properties (like 'untitled')
    *         can be set by the caller
-   * @throws Exception 
+   * @throws Exception
    */
   public Editor handleOpen(File file) throws Exception {
     return handleOpen(file, nextEditorLocation(), true);
@@ -1007,10 +1007,10 @@ public class Base {
     });
     importMenu.add(addLibraryMenuItem);
     importMenu.addSeparator();
-    
+
     // Split between user supplied libraries and IDE libraries
     TargetPlatform targetPlatform = getTargetPlatform();
-    
+
     if (targetPlatform != null) {
       LibraryList ideLibs = getIDELibs();
       LibraryList userLibs = getUserLibs();
@@ -1078,7 +1078,7 @@ public class Base {
 
   public void onBoardOrPortChange() {
     BaseNoGui.onBoardOrPortChange();
-
+    setCustomMessageForSelectedBoard("unowifi",_("Remember to set the UNO WiFi board in 'STA' mode through the configuration panel."));
     // Update editors status bar
     for (Editor editor : editors)
       editor.onBoardOrPortChange();
@@ -1106,7 +1106,7 @@ public class Base {
     }
     for (String title : titles)
       makeBoardCustomMenu(toolsMenu, _(title));
-    
+
     // Cycle through all packages
     for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
       // For every package cycle through all platform
@@ -1118,7 +1118,7 @@ public class Base {
         first = false;
 
         // Add a title for each platform
-        String platformLabel = targetPlatform.getPreferences().get("name"); 
+        String platformLabel = targetPlatform.getPreferences().get("name");
         if (platformLabel != null && !targetPlatform.getBoards().isEmpty()) {
           JMenuItem menuLabel = new JMenuItem(_(platformLabel));
           menuLabel.setEnabled(false);
@@ -1158,7 +1158,7 @@ public class Base {
     String boardId = board.getId();
     String packageName = targetPackage.getId();
     String platformName = targetPlatform.getId();
-    
+
     // Setup a menu item for the current board
     @SuppressWarnings("serial")
     Action action = new AbstractAction(board.getName()) {
@@ -1184,7 +1184,7 @@ public class Base {
     for (final String menuId : customMenus.keySet()) {
       String title = customMenus.get(menuId);
       JMenu menu = getBoardCustomMenu(_(title));
-      
+
       if (board.hasMenu(menuId)) {
         PreferencesMap boardCustomMenu = board.getMenuLabels(menuId);
         for (String customMenuOption : boardCustomMenu.keySet()) {
@@ -1213,8 +1213,16 @@ public class Base {
         }
       }
     }
-    
+
     return item;
+  }
+
+  private void setCustomMessageForSelectedBoard(String boardId, String message){
+    if(BaseNoGui.getTargetBoard().getId().equals(boardId)){
+      for (Editor editor : editors) {
+        editor.statusNotice(message);
+      }
+    }
   }
 
   private static void filterVisibilityOfSubsequentBoardMenus(TargetBoard board, int fromIndex) {
@@ -1255,7 +1263,7 @@ public class Base {
   private JMenu getBoardCustomMenu() throws Exception {
     return getBoardCustomMenu(_("Board"));
   }
-  
+
   private JMenu getBoardCustomMenu(String label) throws Exception {
     for (JMenu menu : Editor.boardsMenus)
       if (label.equals(menu.getText()))
