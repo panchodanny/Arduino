@@ -399,6 +399,25 @@
       <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/openocd.bin" />
     </chmod>
 
+    <!-- Unzip dfu-util tools osx -->
+    <antcall target="untar">
+        <param name="archive_file" value="${staging_folder}/dist/dfu-util-dsigma-osx.tar.gz" />
+        <param name="archive_url" value="http://download.arduino.org/tools/dfu-util-dsigma-osx.tar.gz" />
+        <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/dfu-util" />
+        <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+
+    <chmod perm="+x">
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util/bin" includes="**/*" />
+    </chmod>
+
+    <!-- macosx gatekeeper workaround for dfu-util. See https://github.com/arduino/Arduino/issues/3468 -->
+    <chmod perm="-x">
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="dfu-util/bin/dfu-util-bin" />
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="dfu-util/bin/dfu-prefix-bin" />
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="dfu-util/bin/dfu-suffix-bin" />
+    </chmod>
+
     <!-- Unzip CMSIS -->
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/dist/CMSIS.zip" />
@@ -697,6 +716,18 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
     <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino/bin/openocd" />
+
+    <!-- Unzip dfu-util tools linux32 -->
+    <antcall target="untar">
+        <param name="archive_file" value="${staging_folder}/dist/dfu-util-dsigma-linux-i686.tar.gz" />
+        <param name="archive_url" value="http://download.arduino.org/tools/dfu-util-dsigma-linux-i686.tar.gz" />
+        <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util" />
+        <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+
+    <chmod perm="+x">
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util/bin" includes="**/*" />
+    </chmod>
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
@@ -724,6 +755,18 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
     </antcall>
     <chmod perm="755" file="${staging_folder}/work/${staging_hardware_folder}/tools/OpenOCD-0.9.0-arduino/bin/openocd" />
+
+    <!-- Unzip dfu-util tools linux64 -->
+    <antcall target="untar">
+        <param name="archive_file" value="${staging_folder}/dist/dfu-util-dsigma-linux-x86_64.tar.gz" />
+        <param name="archive_url" value="http://download.arduino.org/tools/dfu-util-dsigma-linux-x86_64.tar.gz" />
+        <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util" />
+        <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+
+    <chmod perm="+x">
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util/bin" includes="**/*" />
+    </chmod>
   </target>
 
   <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
@@ -994,6 +1037,18 @@
     <chmod perm="755">
       <fileset dir="windows/work/hardware/tools/esp-link-tools" includes="**/*.cmd, **/*.*" />
       <fileset dir="windows/work/hardware/tools/esp-link-tools/bin" includes="**/*.exe" />
+    </chmod>
+
+    <!-- Unzip dfu-util tools win32 -->
+    <antcall target="untar">
+        <param name="archive_file" value="${staging_folder}/dist/dfu-util-dsigma-win32.tar.gz" />
+        <param name="archive_url" value="http://download.arduino.org/tools/dfu-util-dsigma-win32.tar.gz" />
+        <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util" />
+        <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    </antcall>
+
+    <chmod perm="+x">
+        <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools/dfu-util/bin" includes="**/*" />
     </chmod>
 
   </target>
