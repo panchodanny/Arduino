@@ -44,7 +44,7 @@ void loop()
       digitalWrite(13,LOW);
       delay(800);
     }
-    RTC->MODE2.INTFLAG.bit.ALARM0=1; //clearing alarm0 flag
+    rtc.alarmClearFlag();  //clearing alarm flag
   } 
    
 }

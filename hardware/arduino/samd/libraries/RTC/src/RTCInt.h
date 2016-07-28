@@ -99,6 +99,7 @@ public:
 	void enableAlarm(unsigned int mode, unsigned int type, voidFuncPtr callback);
 	void setAlarm(void);
 	bool alarmMatch(void);
+	void alarmClearFlag(void);
 	
 
 private:
