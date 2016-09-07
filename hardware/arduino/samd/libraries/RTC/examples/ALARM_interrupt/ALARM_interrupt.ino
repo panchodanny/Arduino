@@ -50,5 +50,5 @@ void alarm_int(void)
       //delay(800);
       for(int j=0; j < 2000000; j++) asm("NOP");
     }
-    RTC->MODE2.INTFLAG.bit.ALARM0=1; //clearing alarm0 flag
+    rtc.alarmClearFlag();  //clearing alarm flag
 }    
