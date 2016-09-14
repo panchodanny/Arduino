@@ -1,3 +1,19 @@
+ARDUINO 1.7.11 - 2016.09.14
+
+[ide]
+* Arduino17 application directory
+
+[libraries]
+* upd braccio library to 2.0.0
+* fix wire library - freq restored to 2
+* upd eeprom library to 2.0.0
+
+[core]
+* upd SAMD compiler flag -MMD
+* fix RTC library moved into SAMD core libraries
+* upd RTC library new alarmClearFlag fuction
+* fix Server.h - include Print.h
+
 ARDUINO 1.7.10 - 2016.04.15
 
 [ide]
