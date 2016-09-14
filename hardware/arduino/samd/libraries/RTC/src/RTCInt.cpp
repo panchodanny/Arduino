@@ -551,6 +551,15 @@ bool RTCInt::alarmMatch(void)
 	   return RTC->MODE2.INTFLAG.bit.ALARM0;
    }
 
+/**********************************************************************************************************************
+*Description: Function for clearing the alarm flag.This function is used when you adopt ALARM_POLLED mode 	
+*Input Parameters: None
+*Return Parameter: None
+***********************************************************************************************************************/   
+void RTCInt::alarmClearFlag(void){
+	RTC->MODE2.INTFLAG.bit.ALARM0=1; //clearing alarm0 flag
+}   
+
 /*
  * Private Utility Functions
  */
