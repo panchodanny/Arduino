@@ -109,7 +109,7 @@ class SPIClass {
 	void setDataMode(uint8_t uc_mode);
 	void setClockDivider(uint16_t uc_div);
 
-  private:
+  protected:
 	SERCOM *_p_sercom;
 	uint8_t _uc_pinMiso;
 	uint8_t _uc_pinMosi;
